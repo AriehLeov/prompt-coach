@@ -182,6 +182,22 @@
       opacity:.92;
     }
     .langbtn:hover{opacity:1;background:rgba(255,255,255,.06)}
+
+    /* =========================
+       AJOUTS: BADGES LEOV VISIBLES
+       (sans rien supprimer)
+    ========================= */
+    .chip.leov{
+      border-color:rgba(79,70,229,.55);
+      background:rgba(79,70,229,.16);
+      color:rgba(234,240,255,.96);
+      font-weight:650;
+    }
+    .chip.leov2{
+      border-color:rgba(34,197,94,.45);
+      background:rgba(34,197,94,.10);
+      color:rgba(234,240,255,.92);
+    }
   </style>
 </head>
 
@@ -216,12 +232,23 @@
           Objectif : t’aider à passer d’un prompt “flou” à un prompt <b>clair</b>, <b>contextualisé</b>, <b>contraint</b> et <b>testable</b>.
           Remplis les champs → observe le score → applique les améliorations → copie le prompt final.
         </div>
+
+        <!-- EXISTANT: chips "bonnes pratiques" -->
         <div class="chiprow">
           <span class="chip" id="chip1">✅ Contexte &amp; intention</span>
           <span class="chip" id="chip2">✅ Contraintes (format, ton, longueur)</span>
           <span class="chip" id="chip3">✅ Données / exemples</span>
           <span class="chip" id="chip4">✅ Critères de succès</span>
           <span class="chip" id="chip5">✅ Itération (questions manquantes)</span>
+        </div>
+
+        <!-- AJOUT: chips LEOV visibles (UI FR/EN via i18n) -->
+        <div class="chiprow" id="leovChipsRow">
+          <span class="chip leov" id="leov_chip1">LEOV Prompt Framework</span>
+          <span class="chip leov2" id="leov_chip2">Structured</span>
+          <span class="chip leov2" id="leov_chip3">Constrained</span>
+          <span class="chip leov2" id="leov_chip4">Testable</span>
+          <span class="chip leov2" id="leov_chip5">Anti-hallucination</span>
         </div>
       </div>
 
@@ -449,17 +476,27 @@
       mainSub: `Objectif : t’aider à passer d’un prompt “flou” à un prompt <b>clair</b>, <b>contextualisé</b>, <b>contraint</b> et <b>testable</b>.
                Remplis les champs → observe le score → applique les améliorations → copie le prompt final.`,
       chips: [
-        "✅ Contexte & intention",
+        "✅ Contexte &amp; intention",
         "✅ Contraintes (format, ton, longueur)",
         "✅ Données / exemples",
         "✅ Critères de succès",
         "✅ Itération (questions manquantes)"
       ],
+
+      /* AJOUT: badges visibles (FR) */
+      leovChips: [
+        "LEOV Prompt Framework",
+        "Structuré",
+        "Contraint",
+        "Testable",
+        "Anti-hallucination"
+      ],
+
       btnLoadDemo: "Charger un exemple",
       btnReset: "Réinitialiser",
       btnCopy: "Copier le prompt final",
       builderTitle: "1) Constructeur de prompt",
-      diagTitle: "2) Diagnostic & prompt final",
+      diagTitle: "2) Diagnostic &amp; prompt final",
       labels: {
         goal: "Objectif (une phrase)",
         role: "Rôle / posture demandée",
@@ -509,10 +546,10 @@
       toneOpts: {
         neutre: "Neutre",
         pro: "Professionnel",
-        direct: "Direct & concis",
+        direct: "Direct &amp; concis",
         pedago: "Pédagogique",
         creatif: "Créatif",
-        humble: "Empathique & humble"
+        humble: "Empathique &amp; humble"
       },
       placeholders: {
         goal: "Ex: Rédiger un email de relance professionnel…",
@@ -523,7 +560,12 @@
         success: "Ex: doit être actionnable, clair, pas d’hypothèses, inclure 3 étapes et un CTA…",
         audience: "Ex: un directeur RH, un client, des enfants de 6–10 ans…",
         examples: "Ex: j’aime des phrases courtes, un ton factuel; je n’aime pas les généralités…"
-      }
+      },
+
+      /* AJOUT: méthode LEOV (FR) pour injection dans le prompt copié */
+      leovMethodTitle: "LEOV Prompt Framework",
+      leovMethodLine: "Méthode : Intention → Contexte → Inputs → Contraintes → Format → Critères → Garde-fous",
+      leovSignature: "Généré avec LEOV Prompt Coach • Structured • Constrained • Testable • https://www.leov.co"
     },
 
     en: {
@@ -540,6 +582,16 @@
         "✅ Success criteria",
         "✅ Iteration (missing questions)"
       ],
+
+      /* AJOUT: badges visibles (EN) */
+      leovChips: [
+        "LEOV Prompt Framework",
+        "Structured",
+        "Constrained",
+        "Testable",
+        "Anti-hallucination"
+      ],
+
       btnLoadDemo: "Load an example",
       btnReset: "Reset",
       btnCopy: "Copy final prompt",
@@ -594,10 +646,10 @@
       toneOpts: {
         neutre: "Neutral",
         pro: "Professional",
-        direct: "Direct & concise",
+        direct: "Direct &amp; concise",
         pedago: "Educational",
         creatif: "Creative",
-        humble: "Empathetic & humble"
+        humble: "Empathetic &amp; humble"
       },
       placeholders: {
         goal: "e.g., Write a professional follow-up email…",
@@ -608,7 +660,12 @@
         success: "e.g., must be actionable, clear, no assumptions, include 3 steps and a CTA…",
         audience: "e.g., HR Director, a client, kids aged 6–10…",
         examples: "e.g., I like short sentences, factual tone; I dislike generic advice…"
-      }
+      },
+
+      /* AJOUT: méthode LEOV (EN) pour injection dans le prompt copié */
+      leovMethodTitle: "LEOV Prompt Framework",
+      leovMethodLine: "Method: Intent → Context → Inputs → Constraints → Format → Criteria → Guardrails",
+      leovSignature: "Generated with LEOV Prompt Coach • Structured • Constrained • Testable • https://www.leov.co"
     }
   };
 
@@ -739,6 +796,36 @@
     }
   }
 
+  /* =========================
+     AJOUT: injection méthode LEOV
+     + signature LEOV (dans le prompt copié)
+     (sans rien supprimer)
+  ========================= */
+  function buildLeovMethodBlock(){
+    const t = I18N[lang];
+    const title = t.leovMethodTitle;
+    const line = t.leovMethodLine;
+
+    // Bloc volontairement explicite et long (anti-ambiguïté)
+    // Ne supprime rien du prompt existant: on ajoute juste au début.
+    return `# ${title}\n${line}\n\n` +
+           `## Purpose\n` +
+           (lang==="fr"
+             ? `Ce prompt suit un cadre pour réduire l’ambiguïté, éviter les inventions et rendre la sortie testable.\n\n`
+             : `This prompt follows a framework to reduce ambiguity, avoid hallucinations, and make the output testable.\n\n`
+           ) +
+           `## Instructions\n` +
+           (lang==="fr"
+             ? `- Respecte strictement les sections et contraintes ci-dessous.\n- Si une information critique manque, pose jusqu’à 3 questions avant de produire la réponse.\n- N’invente pas de faits.\n\n`
+             : `- Follow the sections and constraints strictly.\n- If critical information is missing, ask up to 3 questions before producing the answer.\n- Do not invent facts.\n\n`
+           );
+  }
+
+  function buildLeovSignatureBlock(){
+    const t = I18N[lang];
+    return `\n---\n${t.leovSignature}\n`;
+  }
+
   function synthesizePrompt(d){
     const goal = sanitize(d.goal);
     const role = sanitize(d.role);
@@ -772,7 +859,11 @@
       ? `## Garde-fous\n- Si une information importante manque, pose jusqu’à 3 questions courtes avant de répondre.\n- N’invente pas de faits : si tu dois supposer, explicite l’hypothèse.\n`
       : `## Guardrails\n- If critical information is missing, ask up to 3 short questions before answering.\n- Do not invent facts: if you must assume, state your assumptions explicitly.\n`;
 
-    return `${header}\n${core}${guard}`.trim();
+    /* AJOUT: bloc LEOV placé au début + signature à la fin (sans retirer le reste) */
+    const leovMethod = buildLeovMethodBlock();
+    const leovSig = buildLeovSignatureBlock();
+
+    return `${leovMethod}${header}\n${core}${guard}${leovSig}`.trim();
   }
 
   // ---------- Suggestions ----------
@@ -1227,6 +1318,13 @@
     $id("chip3").innerHTML = t.chips[2];
     $id("chip4").innerHTML = t.chips[3];
     $id("chip5").innerHTML = t.chips[4];
+
+    /* AJOUT: textes des badges LEOV (UI identique FR/EN) */
+    $id("leov_chip1").innerText = t.leovChips[0];
+    $id("leov_chip2").innerText = t.leovChips[1];
+    $id("leov_chip3").innerText = t.leovChips[2];
+    $id("leov_chip4").innerText = t.leovChips[3];
+    $id("leov_chip5").innerText = t.leovChips[4];
 
     $id("btnLoadDemo").innerText = t.btnLoadDemo;
     $id("btnReset").innerText = t.btnReset;
