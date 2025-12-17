@@ -768,11 +768,34 @@
     core += formatBlock(lang==="fr" ? "Critères de succès" : "Success criteria", success);
     core += formatBlock(lang==="fr" ? "Préférences / exemples" : "Preferences / examples", examples);
 
-    const guard = (lang==="fr")
-      ? `## Garde-fous\n- Si une information importante manque, pose jusqu’à 3 questions courtes avant de répondre.\n- N’invente pas de faits : si tu dois supposer, explicite l’hypothèse.\n`
-      : `## Guardrails\n- If critical information is missing, ask up to 3 short questions before answering.\n- Do not invent facts: if you must assume, state your assumptions explicitly.\n`;
+    // ================================
+// FINAL INSTRUCTIONS (LEOV STANDARD)
+// ================================
+const finalInstructionsFR = `
+## INSTRUCTIONS FINALES IMPORTANTES
+- Suis strictement toutes les instructions et contraintes ci-dessus.
+- Si une information critique est manquante, pose jusqu’à 3 questions AVANT de répondre.
+- N’invente aucun fait.
+- Si tu fais une hypothèse, explicite-la clairement.
+- Privilégie une réponse claire, structurée et directement actionnable.
+`;
 
-    return `${header}\n${core}${guard}`.trim();
+const finalInstructionsEN = `
+## FINAL INSTRUCTIONS
+- Strictly follow all instructions and constraints above.
+- If critical information is missing, ask up to 3 questions BEFORE answering.
+- Do not invent facts.
+- If you make assumptions, clearly state them.
+- Favor clarity, structure, and actionable output.
+`;
+    
+const instructionsFinales =
+  document.documentElement.lang === "fr"
+    ? finalInstructionsFR
+    : finalInstructionsEN;
+
+const final = `${header}\n${core}\n${instructionsFinales}`.trim();
+;
   }
 
   // ---------- Suggestions ----------
