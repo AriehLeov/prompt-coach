@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<!-- saved from url=(0048)file:///C:/Users/arieh/Desktop/prompt-coach.html -->
+<html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Prompt Coach — Bonnes pratiques (ChatGPT)</title>
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#121a33; --panel2:#0f1630; --text:#eaf0ff; --muted:#b9c3e6;
+      --accent:#7aa2ff; --good:#4ade80; --warn:#fbbf24; --bad:#fb7185; --border:rgba(255,255,255,.12);
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(1200px 600px at 30% -10%, rgba(122,162,255,.25), transparent 60%),
+                  radial-gradient(900px 500px at 90% 0%, rgba(74,222,128,.18), transparent 55%),
+                  var(--bg);
+         color:var(--text);font-family:var(--sans); line-height:1.35}
+    a{color:var(--accent); text-decoration:none}
+    .wrap{max-width:1200px;margin:0 auto;padding:28px 18px 80px}
+    header{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+    .title{display:flex;flex-direction:column;gap:6px}
+    h1{margin:0;font-size:22px;letter-spacing:.2px}
+    .sub{color:var(--muted);font-size:13px;max-width:760px}
+    .chiprow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .chip{border:1px solid var(--border);background:rgba(255,255,255,.05);padding:7px 10px;border-radius:999px;font-size:12px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:14px;margin-top:16px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+          border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden}
+    .card h2{margin:0;font-size:14px;letter-spacing:.3px;text-transform:uppercase;color:rgba(234,240,255,.88)}
+    .card .hd{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .card .bd{padding:14px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .btn{appearance:none;border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--text);
+         padding:9px 11px;border-radius:12px;cursor:pointer;font-size:13px}
+    .btn:hover{background:rgba(255,255,255,.08)}
+    .btn.primary{border-color:rgba(122,162,255,.6);background:rgba(122,162,255,.15)}
+    .btn.danger{border-color:rgba(251,113,133,.6);background:rgba(251,113,133,.12)}
+    .btn.good{border-color:rgba(74,222,128,.6);background:rgba(74,222,128,.12)}
+    .btn:active{transform:translateY(1px)}
+    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--border);font-size:12px;color:var(--muted)}
+    .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    @media (max-width:720px){.kpi{grid-template-columns:repeat(2,1fr)}}
+    .kpi .box{border:1px solid rgba(255,255,255,.09);background:rgba(0,0,0,.12);border-radius:14px;padding:10px}
+    .kpi .lab{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .kpi .val{font-size:18px;font-weight:700}
+    .bar{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid rgba(255,255,255,.09)}
+    .bar > div{height:100%;width:0%;background:linear-gradient(90deg,var(--bad),var(--warn),var(--good))}
+    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+    input[type="text"], textarea, select{
+      width:100%; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.18); color:var(--text);
+      border-radius:14px; padding:10px 11px; outline:none; font-size:13px
+    }
+    textarea{min-height:88px;resize:vertical}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:720px){.two{grid-template-columns:1fr}}
+    .checklist{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+    @media (max-width:900px){.checklist{grid-template-columns:1fr}}
+    .item{border:1px solid rgba(255,255,255,.09);background:rgba(0,0,0,.12);border-radius:14px;padding:10px;display:flex;gap:10px;align-items:flex-start}
+    .item input{margin-top:2px}
+    .item .t{font-weight:650;font-size:13px}
+    .item .d{font-size:12px;color:var(--muted);margin-top:2px}
+    .hint{font-size:12px;color:var(--muted);margin-top:8px}
+    .mono{font-family:var(--mono)}
+    .out{
+      white-space:pre-wrap; word-break:break-word;
+      border:1px dashed rgba(255,255,255,.18);
+      background:rgba(0,0,0,.2);
+      border-radius:14px; padding:12px; font-size:12.5px;
+    }
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tab{padding:8px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.14);cursor:pointer;font-size:13px;color:var(--muted)}
+    .tab.active{border-color:rgba(122,162,255,.65);background:rgba(122,162,255,.16);color:var(--text)}
+    .examples{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:900px){.examples{grid-template-columns:1fr}}
+    .badge{font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.12);color:var(--muted)}
+    .footer{margin-top:16px;color:rgba(185,195,230,.85);font-size:12px}
+    .small{font-size:12px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>Prompt Coach — App interactive (bonnes pratiques de prompts pour ChatGPT)</h1>
+        <div class="sub">
+          Objectif : t’aider à passer d’un prompt “flou” à un prompt <b>clair</b>, <b>contextualisé</b>, <b>contraint</b> et <b>testable</b>.
+          Remplis les champs → observe le score → applique les améliorations → copie le prompt final.
+        </div>
+        <div class="chiprow">
+          <span class="chip">✅ Contexte &amp; intention</span>
+          <span class="chip">✅ Contraintes (format, ton, longueur)</span>
+          <span class="chip">✅ Données / exemples</span>
+          <span class="chip">✅ Critères de succès</span>
+          <span class="chip">✅ Itération (questions manquantes)</span>
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn primary" id="btnLoadDemo">Charger un exemple</button>
+        <button class="btn" id="btnReset">Réinitialiser</button>
+        <button class="btn good" id="btnCopy">Copier le prompt final</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: Builder -->
+      <section class="card">
+        <div class="hd">
+          <h2>1) Constructeur de prompt</h2>
+          <span class="pill" id="modePill">Mode : Général</span>
+        </div>
+        <div class="bd">
+          <div class="two">
+            <div>
+              <label>Objectif (une phrase)</label>
+              <input type="text" id="goal" placeholder="Ex: Rédiger un email de relance professionnel…">
+              <div class="hint">Astuce : commence par un verbe d’action (rédiger, analyser, comparer, résumer, proposer…).</div>
+            </div>
+            <div>
+              <label>Rôle / posture demandée</label>
+              <input type="text" id="role" placeholder="Ex: Agis comme un recruteur senior / un tuteur / un coach…">
+              <div class="hint">Astuce : un rôle utile = compétence + angle (ex: “coach carrière orienté marché québécois”).</div>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <div class="two">
+            <div>
+              <label>Contexte (qui / quoi / pourquoi)</label>
+              <textarea id="context" placeholder="Ex: Je postule à un poste de… J’ai ce parcours… Le but est de…"></textarea>
+            </div>
+            <div>
+              <label>Entrées (données, texte, liste, contraintes métier)</label>
+              <textarea id="inputs" placeholder="Colle ici le texte à retravailler, un brief, des points clés, un tableau, etc."></textarea>
+              <div class="hint">Astuce : plus tu fournis d’inputs concrets, moins le modèle “invente”.</div>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <div class="two">
+            <div>
+              <label>Format de sortie</label>
+              <select id="format">
+                <option value="auto">Auto (à partir des contraintes)</option>
+                <option value="bullets">Bullet points</option>
+                <option value="table">Tableau</option>
+                <option value="email">Email</option>
+                <option value="plan">Plan détaillé</option>
+                <option value="code">Code (avec instructions)</option>
+                <option value="json">JSON (schéma simple)</option>
+              </select>
+              <div class="hint">Astuce : “donne-moi un tableau” = colonne/ordre/format des dates/unités.</div>
+            </div>
+            <div>
+              <label>Tonalité</label>
+              <select id="tone">
+                <option value="neutre">Neutre</option>
+                <option value="pro">Professionnel</option>
+                <option value="direct">Direct &amp; concis</option>
+                <option value="pedago">Pédagogique</option>
+                <option value="creatif">Créatif</option>
+                <option value="humble">Empathique &amp; humble</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <div class="two">
+            <div>
+              <label>Contraintes (longueur, langue, interdits, style…)</label>
+              <textarea id="constraints" placeholder="Ex: 180–220 mots, français, pas de jargon, 3 options, pas de flatterie excessive…"></textarea>
+            </div>
+            <div>
+              <label>Critères de succès (comment juger que c’est bon ?)</label>
+              <textarea id="success" placeholder="Ex: doit être actionnable, clair, pas d’hypothèses, inclure 3 étapes et un CTA…"></textarea>
+              <div class="hint">Astuce : ajoute “si info manquante → pose 3 questions max”.</div>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <div class="two">
+            <div>
+              <label>Audience cible</label>
+              <input type="text" id="audience" placeholder="Ex: un directeur RH, un client, des enfants de 6–10 ans…">
+            </div>
+            <div>
+              <label>Exemple (optionnel) : “ce que j’aime / n’aime pas”</label>
+              <textarea id="examples" placeholder="Ex: j’aime des phrases courtes, un ton factuel; je n’aime pas les généralités…"></textarea>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <div class="checklist" id="checklist"><div class="item">
+        <input type="checkbox" id="chk_goal" disabled="">
+        <div>
+          <div class="t">1. Objectif explicite</div>
+          <div class="d">Le modèle sait exactement quoi produire.</div>
+        </div>
+      </div><div class="item">
+        <input type="checkbox" id="chk_role" disabled="">
+        <div>
+          <div class="t">2. Rôle / posture</div>
+          <div class="d">Tu imposes une expertise et un angle (coach, tuteur, analyste…).</div>
+        </div>
+      </div><div class="item">
+        <input type="checkbox" id="chk_context" disabled="">
+        <div>
+          <div class="t">3. Contexte suffisant</div>
+          <div class="d">Qui/quoi/pourquoi + contraintes de situation.</div>
+        </div>
+      </div><div class="item">
+        <input type="checkbox" id="chk_inputs" disabled="">
+        <div>
+          <div class="t">4. Inputs concrets</div>
+          <div class="d">Texte, données, exemples, éléments à respecter.</div>
+        </div>
+      </div><div class="item">
+        <input type="checkbox" id="chk_constraints" disabled="">
+        <div>
+          <div class="t">5. Contraintes</div>
+          <div class="d">Longueur, langue, interdits, style, nombre d’options…</div>
+        </div>
+      </div><div class="item">
+        <input type="checkbox" id="chk_format" disabled="">
+        <div>
+          <div class="t">6. Format de sortie</div>
+          <div class="d">Tu réduis les ambiguïtés (tableau, étapes, email…).</div>
+        </div>
+      </div><div class="item">
+        <input type="checkbox" id="chk_success" disabled="">
+        <div>
+          <div class="t">7. Critères de succès</div>
+          <div class="d">Comment juger la réponse + ‘pose questions si manque’.</div>
+        </div>
+      </div></div>
+
+          <div class="row" style="margin-top:12px;justify-content:space-between">
+            <div class="small">🔁 Tout est recalculé en temps réel (score + recommandations).</div>
+            <div class="row">
+              <button class="btn" id="btnAsk3">Ajouter “pose 3 questions si manque”</button>
+              <button class="btn" id="btnAddSteps">Ajouter “réponds en étapes”</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Score + Output -->
+      <aside class="card">
+        <div class="hd">
+          <h2>2) Diagnostic &amp; prompt final</h2>
+          <div class="tabs">
+            <div class="tab active" data-tab="score">Score</div>
+            <div class="tab" data-tab="suggest">Suggestions</div>
+            <div class="tab" data-tab="examples">Avant / Après</div>
+          </div>
+        </div>
+
+        <div class="bd" id="tab-score">
+          <div class="kpi">
+            <div class="box">
+              <div class="lab">Score prompt</div>
+              <div class="val" id="scoreVal">0/100</div>
+            </div>
+            <div class="box">
+              <div class="lab">Clarté</div>
+              <div class="val" id="kpiClarity">0</div>
+            </div>
+            <div class="box">
+              <div class="lab">Contraintes</div>
+              <div class="val" id="kpiConstraints">0</div>
+            </div>
+            <div class="box">
+              <div class="lab">Données</div>
+              <div class="val" id="kpiData">0</div>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+          <div class="bar"><div id="scoreBar" style="width: 0%;"></div></div>
+          <div class="hint" id="scoreMsg">Faible : prompt trop vague. Commence par objectif + contexte + format + contraintes.</div>
+
+          <div style="height:12px"></div>
+          <label>Prompt final (copiable)</label>
+          <div class="out mono" id="finalPrompt">Ton : neutre.<br><br>## Garde-fous<br>- Si une information importante manque, pose jusqu’à 3 questions courtes avant de répondre.<br>- N’invente pas de faits : si tu dois supposer, explicite l’hypothèse.</div>
+
+          <div class="row" style="margin-top:10px;justify-content:space-between">
+            <button class="btn" id="btnExportTxt">Exporter .txt</button>
+            <button class="btn" id="btnExportJson">Exporter .json</button>
+          </div>
+
+          <div class="footer">
+            Rappel : un bon prompt = <b>intention</b> + <b>contexte</b> + <b>inputs</b> + <b>contraintes</b> + <b>format</b> + <b>critères</b>.
+          </div>
+        </div>
+
+        <div class="bd" id="tab-suggest" style="display:none">
+          <label>Recommandations concrètes (priorisées)</label>
+          <div id="suggestions">
+      <div class="item" style="margin-bottom:10px">
+        <div class="badge">P1</div>
+        <div>
+          <div class="t">Clarifie l’objectif</div>
+          <div class="d">Réécris l’objectif en 1 phrase action : *verbe + livrable + sujet* (ex: “Rédige un email de relance…”)</div>
+        </div>
+      </div>
+    
+      <div class="item" style="margin-bottom:10px">
+        <div class="badge">P2</div>
+        <div>
+          <div class="t">Ajoute un contexte minimal</div>
+          <div class="d">Qui est concerné ? Dans quel cadre ? Pourquoi maintenant ? 2–5 lignes suffisent.</div>
+        </div>
+      </div>
+    
+      <div class="item" style="margin-bottom:10px">
+        <div class="badge">P3</div>
+        <div>
+          <div class="t">Fournis des inputs concrets</div>
+          <div class="d">Colle le texte/données à transformer, ou liste les faits à respecter. Sans inputs, le modèle complète au hasard.</div>
+        </div>
+      </div>
+    
+      <div class="item" style="margin-bottom:10px">
+        <div class="badge">P4</div>
+        <div>
+          <div class="t">Spécifie des contraintes</div>
+          <div class="d">Longueur, langue, style, interdits, nombre d’options, niveau de détail.</div>
+        </div>
+      </div>
+    
+      <div class="item" style="margin-bottom:10px">
+        <div class="badge">P5</div>
+        <div>
+          <div class="t">Force un format de sortie</div>
+          <div class="d">Choisis un format (tableau, étapes, email, JSON…) et précise la structure attendue.</div>
+        </div>
+      </div>
+    
+      <div class="item" style="margin-bottom:10px">
+        <div class="badge">P6</div>
+        <div>
+          <div class="t">Ajoute des critères de succès</div>
+          <div class="d">Écris 3–5 critères mesurables (doit inclure…, éviter…, ton…, CTA…).</div>
+        </div>
+      </div>
+    
+      <div class="item" style="margin-bottom:10px">
+        <div class="badge">P7</div>
+        <div>
+          <div class="t">Définis un rôle utile</div>
+          <div class="d">“Agis comme …” (expertise + angle). Exemple : “coach carrière orienté Québec”.</div>
+        </div>
+      </div>
+    </div>
+          <div style="height:10px"></div>
+          <label>“Anti-patterns” fréquents</label>
+          <div class="out" id="antipatterns">• “Fais-moi un truc bien” → pas d’objectif, pas de format, pas de critères<br>• “Tu vois ce que je veux dire” → le modèle ne lit pas tes intentions implicites<br>• “Comme tu veux” / “au choix” → ouvre trop l’espace de réponse<br>• Aucun input (texte / données) → risque d’hallucination ou de généralités<br>• Trop de demandes sans priorités → mélange, réponse superficielle<br>• Format non imposé → structure aléatoire, difficile à réutiliser<br>• Critères absents → impossible de juger si c’est “bon”</div>
+        </div>
+
+        <div class="bd" id="tab-examples" style="display:none">
+          <div class="examples">
+            <div>
+              <div class="row" style="justify-content:space-between;margin-bottom:6px">
+                <label>Prompt “avant” (trop vague)</label>
+                <span class="badge">Flou / Non testable</span>
+              </div>
+              <div class="out mono" id="beforeEx">Peux-tu m'aider ? Fais un texte sympa.</div>
+            </div>
+            <div>
+              <div class="row" style="justify-content:space-between;margin-bottom:6px">
+                <label>Prompt “après” (amélioré)</label>
+                <span class="badge">Contraint / Actionnable</span>
+              </div>
+              <div class="out mono" id="afterEx">Tu es un assistant expert.<br>Ton : neutre.<br><br># Tâche<br>Rédige un livrable utile sur le sujet ci-dessous.<br><br>## Contexte<br>Contexte : …<br><br>## Entrées<br>Entrées : …<br><br>## Contraintes<br>Contraintes : …<br><br>## Critères de succès<br>Critères : …<br><br>## Garde-fous<br>- Si une information importante manque, pose jusqu’à 3 questions courtes avant de répondre.<br>- N’invente pas de faits : si tu dois supposer, explicite l’hypothèse.</div>
+            </div>
+          </div>
+          <div style="height:10px"></div>
+          <label>Templates rapides</label>
+          <div class="row" style="gap:8px;flex-wrap:wrap">
+            <button class="btn" data-template="rewrite">Réécriture</button>
+            <button class="btn" data-template="analysis">Analyse</button>
+            <button class="btn" data-template="plan">Plan</button>
+            <button class="btn" data-template="code">Code</button>
+            <button class="btn" data-template="brainstorm">Brainstorm</button>
+          </div>
+          <div class="hint">Clique un template → il pré-remplit le builder avec une structure de prompt.</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // ---------- Helpers ----------
+  const $ = (id) => document.getElementById(id);
+  const sanitize = (s) => (s || "").toString().trim();
+  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+  const nowISO = () => new Date().toISOString();
+
+  const state = {
+    demoIndex: 0,
+    checklist: [
+      { key:"goal", title:"Objectif explicite", desc:"Le modèle sait exactement quoi produire." },
+      { key:"role", title:"Rôle / posture", desc:"Tu imposes une expertise et un angle (coach, tuteur, analyste…)." },
+      { key:"context", title:"Contexte suffisant", desc:"Qui/quoi/pourquoi + contraintes de situation." },
+      { key:"inputs", title:"Inputs concrets", desc:"Texte, données, exemples, éléments à respecter." },
+      { key:"constraints", title:"Contraintes", desc:"Longueur, langue, interdits, style, nombre d’options…" },
+      { key:"format", title:"Format de sortie", desc:"Tu réduis les ambiguïtés (tableau, étapes, email…)." },
+      { key:"success", title:"Critères de succès", desc:"Comment juger la réponse + ‘pose questions si manque’." }
+    ]
+  };
+
+  // ---------- Checklist UI ----------
+  function buildChecklist(){
+    const box = $("checklist");
+    box.innerHTML = "";
+    state.checklist.forEach((c, idx) => {
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <input type="checkbox" id="chk_${c.key}" disabled />
+        <div>
+          <div class="t">${idx+1}. ${c.title}</div>
+          <div class="d">${c.desc}</div>
+        </div>
+      `;
+      box.appendChild(div);
+    });
+  }
+
+  // ---------- Scoring ----------
+  function scorePrompt(d){
+    // Lightweight heuristic scoring (0-100)
+    const goal = sanitize(d.goal), role = sanitize(d.role), ctx = sanitize(d.context), inputs = sanitize(d.inputs);
+    const constraints = sanitize(d.constraints), success = sanitize(d.success), audience = sanitize(d.audience);
+    const examples = sanitize(d.examples);
+
+    // Component scores (0-25 each)
+    let clarity = 0, constr = 0, data = 0, test = 0;
+
+    // Clarity: goal + role + audience
+    if (goal.length >= 12) clarity += 12;
+    if (goal.length >= 35) clarity += 6;
+    if (role.length >= 8) clarity += 5;
+    if (audience.length >= 5) clarity += 2;
+
+    // Constraints: constraints + format + tone specifics
+    if (constraints.length >= 10) constr += 10;
+    if (constraints.match(/\b(mots|caract|bullet|tableau|json|titre|sections?)\b/i)) constr += 6;
+    if (constraints.match(/\b(ne pas|éviter|interdit|sans)\b/i)) constr += 4;
+    if (d.format && d.format !== "auto") constr += 5;
+
+    // Data: context + inputs + examples
+    if (ctx.length >= 25) data += 8;
+    if (ctx.length >= 90) data += 5;
+    if (inputs.length >= 20) data += 10;
+    if (inputs.length >= 120) data += 5;
+    if (examples.length >= 20) data += 2;
+
+    // Testability: success criteria + asking questions instruction
+    if (success.length >= 15) test += 10;
+    if (success.match(/\b(critère|doit|devrait|succès|validation|acceptable)\b/i)) test += 6;
+    if ((success + " " + constraints).match(/\b(si|s'il)\b.*\b(manque|incomplet|info)\b.*\b(question)\b/i)) test += 6;
+    if ((success + " " + constraints).match(/\b(étapes|step|checklist|plan)\b/i)) test += 3;
+
+    clarity = clamp(clarity,0,25);
+    constr  = clamp(constr,0,25);
+    data    = clamp(data,0,25);
+    test    = clamp(test,0,25);
+
+    const total = clarity + constr + data + test;
+    const missing = {
+      goal: goal.length < 12,
+      role: role.length < 8,
+      context: ctx.length < 25,
+      inputs: inputs.length < 20,
+      constraints: constraints.length < 10,
+      format: !d.format || d.format === "auto",
+      success: success.length < 15
+    };
+
+    return { total, clarity, constr, data, test, missing };
+  }
+
+  function scoreMessage(total){
+    if (total >= 85) return { txt:"Excellent : prompt très contraint et actionnable. Tu peux itérer sur le style.", mood:"good" };
+    if (total >= 70) return { txt:"Solide : il manque surtout des détails (inputs/contraintes) pour éviter les ambiguïtés.", mood:"warn" };
+    if (total >= 50) return { txt:"Moyen : trop d’espace d’interprétation. Ajoute format + critères + données concrètes.", mood:"warn" };
+    return { txt:"Faible : prompt trop vague. Commence par objectif + contexte + format + contraintes.", mood:"bad" };
+  }
+
+  // ---------- Prompt synthesis ----------
+  function formatBlock(label, content){
+    content = sanitize(content);
+    if (!content) return "";
+    return `## ${label}\n${content}\n\n`;
+  }
+
+  function formatHintFromSelect(format){
+    switch(format){
+      case "bullets": return "Réponds en bullet points.";
+      case "table": return "Réponds sous forme de tableau (colonnes claires).";
+      case "email": return "Rédige un email complet (objet + corps + signature).";
+      case "plan": return "Propose un plan détaillé (niveaux 1/2/3).";
+      case "code": return "Fournis du code complet, exécutable, avec commentaires et étapes.";
+      case "json": return "Réponds uniquement en JSON valide (sans texte autour).";
+      default: return "";
+    }
+  }
+
+  function synthesizePrompt(d){
+    const goal = sanitize(d.goal);
+    const role = sanitize(d.role);
+    const tone = sanitize(d.tone || "neutre");
+    const audience = sanitize(d.audience);
+    const ctx = sanitize(d.context);
+    const inputs = sanitize(d.inputs);
+    const constraints = sanitize(d.constraints);
+    const success = sanitize(d.success);
+    const examples = sanitize(d.examples);
+    const format = d.format || "auto";
+
+    const fmtHint = (format !== "auto") ? formatHintFromSelect(format) : "";
+
+    let header = "";
+    if (role) header += `Tu es ${role}.\n`;
+    if (tone) header += `Ton : ${tone}.\n`;
+    if (audience) header += `Audience cible : ${audience}.\n`;
+
+    let core = "";
+    if (goal) core += `# Tâche\n${goal}\n\n`;
+    core += formatBlock("Contexte", ctx);
+    core += formatBlock("Entrées", inputs);
+    core += formatBlock("Contraintes", constraints || "");
+    if (fmtHint) core += `## Format de sortie\n${fmtHint}\n\n`;
+    core += formatBlock("Critères de succès", success);
+    core += formatBlock("Préférences / exemples", examples);
+
+    // Guardrails
+    const guard = `## Garde-fous\n- Si une information importante manque, pose jusqu’à 3 questions courtes avant de répondre.\n- N’invente pas de faits : si tu dois supposer, explicite l’hypothèse.\n`;
+    const final = `${header}\n${core}${guard}`.trim();
+
+    return final;
+  }
+
+  // ---------- Suggestions ----------
+  function buildSuggestions(d, scored){
+    const s = [];
+    if (scored.missing.goal) s.push({p:1, t:"Clarifie l’objectif", d:"Réécris l’objectif en 1 phrase action : *verbe + livrable + sujet* (ex: “Rédige un email de relance…”)"} );
+    if (scored.missing.context) s.push({p:2, t:"Ajoute un contexte minimal", d:"Qui est concerné ? Dans quel cadre ? Pourquoi maintenant ? 2–5 lignes suffisent."});
+    if (scored.missing.inputs) s.push({p:3, t:"Fournis des inputs concrets", d:"Colle le texte/données à transformer, ou liste les faits à respecter. Sans inputs, le modèle complète au hasard."});
+    if (scored.missing.constraints) s.push({p:4, t:"Spécifie des contraintes", d:"Longueur, langue, style, interdits, nombre d’options, niveau de détail."});
+    if (scored.missing.format) s.push({p:5, t:"Force un format de sortie", d:"Choisis un format (tableau, étapes, email, JSON…) et précise la structure attendue."});
+    if (scored.missing.success) s.push({p:6, t:"Ajoute des critères de succès", d:"Écris 3–5 critères mesurables (doit inclure…, éviter…, ton…, CTA…)."});
+    if (!sanitize(d.role)) s.push({p:7, t:"Définis un rôle utile", d:"“Agis comme …” (expertise + angle). Exemple : “coach carrière orienté Québec”."});
+
+    // Anti-pattern detectors
+    const merged = (sanitize(d.goal) + " " + sanitize(d.context) + " " + sanitize(d.constraints) + " " + sanitize(d.success)).toLowerCase();
+    if (merged.includes("fait moi") && merged.length < 80) s.push({p:8, t:"Trop court = trop flou", d:"Ton prompt est très court : le modèle doit deviner. Ajoute contexte + contraintes."});
+    if (merged.match(/\bcomme tu veux|au choix|n'importe|peu importe\b/)) s.push({p:9, t:"Évite “au choix / peu importe”", d:"Ça ouvre trop la réponse. Remplace par des préférences ou des critères."});
+    if (!merged.match(/\b(fr|français|anglais)\b/) && sanitize(d.constraints).length > 0) s.push({p:10, t:"Ajoute la langue explicitement", d:"Indique “en français / en anglais” si c’est important."});
+
+    s.sort((a,b)=>a.p-b.p);
+    return s;
+  }
+
+  function renderSuggestions(list){
+    const box = $("suggestions");
+    if (!list.length){
+      box.innerHTML = `<div class="out">✅ Rien de critique à corriger. Tu peux maintenant optimiser le style (plus concis, plus persuasif, etc.).</div>`;
+      return;
+    }
+    box.innerHTML = list.map(x => `
+      <div class="item" style="margin-bottom:10px">
+        <div class="badge">P${x.p}</div>
+        <div>
+          <div class="t">${x.t}</div>
+          <div class="d">${x.d}</div>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  // ---------- Examples / Templates ----------
+  const demos = [
+    {
+      name:"Email relance",
+      goal:"Rédige un email de relance pour obtenir une réponse à une candidature envoyée il y a 10 jours.",
+      role:"un recruteur senior (ton professionnel, respectueux, orienté action)",
+      context:"J’ai postulé à un poste de Directeur Transformation. Je veux relancer sans insister, tout en rappelant ma valeur.",
+      inputs:"Nom du recruteur : Sophie Martin\nEntreprise : ExempleCorp\nPoste : Directeur Transformation\nDate d’envoi candidature : il y a 10 jours\nPoint fort à rappeler : 10+ ans de programmes de transformation, leadership, delivery.",
+      constraints:"En français. 140–170 mots. 1 objet d’email. Pas de flatterie excessive. Inclure une proposition de créneau de 15 min.",
+      success:"Doit être clair, poli, et donner envie de répondre. Inclure 1 phrase de rappel de valeur et 1 CTA concret.",
+      audience:"Recruteur / Talent Acquisition",
+      examples:"J’aime un style simple, phrases courtes, pas de jargon.",
+      format:"email",
+      tone:"pro"
+    },
+    {
+      name:"Analyse de texte",
+      goal:"Analyse ce texte et identifie 5 améliorations concrètes (structure, clarté, arguments).",
+      role:"un tuteur d’écriture académique",
+      context:"Je prépare un devoir et j’ai besoin d’un diagnostic actionnable.",
+      inputs:"[COLLE ICI TON TEXTE]\n\n(ou un extrait de 2–3 paragraphes)",
+      constraints:"En français. Réponse en 2 parties : (1) diagnostic (2) recommandations. Chaque recommandation doit inclure un exemple de reformulation.",
+      success:"Doit être précis, non vague, et applicable immédiatement.",
+      audience:"Étudiant / professeur",
+      examples:"",
+      format:"bullets",
+      tone:"pedago"
+    },
+    {
+      name:"Spécification d’app",
+      goal:"Propose une spec claire pour une petite app web (fonctionnalités + pages + données) à développer en 2 jours.",
+      role:"un product manager pragmatique",
+      context:"Je veux cadrer le périmètre avant de coder.",
+      inputs:"Sujet : app de suivi d’entraînement hockey\nUtilisateurs : parent + enfant\nFonctions : planning, exercices, stats simples",
+      constraints:"1 page. Inclure : objectifs, personas, user stories, scope MVP vs plus tard, critères d’acceptation. Ton direct.",
+      success:"Doit être structuré et prêt à être partagé à un dev. Sans blabla.",
+      audience:"Développeur",
+      examples:"",
+      format:"plan",
+      tone:"direct"
+    }
+  ];
+
+  const templates = {
+    rewrite: {
+      goal:"Réécris le texte ci-dessous pour qu’il soit plus clair et plus convaincant.",
+      role:"un éditeur professionnel",
+      context:"Je veux conserver le sens, améliorer la structure et la fluidité.",
+      inputs:"TEXTE À RÉÉCRIRE :\n[COLLE ICI]",
+      constraints:"En français. Conserver les faits. Réduire de 15–25%. Phrases plus courtes. Pas de jargon.",
+      success:"Texte plus lisible, même message, meilleur rythme. Propose aussi 3 alternatives de titre.",
+      audience:"Grand public",
+      examples:"J’aime un style simple et direct.",
+      format:"auto",
+      tone:"pro"
+    },
+    analysis: {
+      goal:"Analyse la situation et propose 3 options avec avantages/inconvénients et une recommandation finale.",
+      role:"un consultant stratégique",
+      context:"Je dois prendre une décision et je veux un raisonnement structuré.",
+      inputs:"CONTEXTE & DONNÉES :\n[COLLE ICI]",
+      constraints:"Réponds en tableau pour les options, puis une recommandation en 5–7 lignes. N’invente pas de données.",
+      success:"Options distinctes, critères explicites, recommandation argumentée.",
+      audience:"Décideur",
+      examples:"",
+      format:"table",
+      tone:"pro"
+    },
+    plan: {
+      goal:"Construis un plan détaillé pour atteindre l’objectif ci-dessous.",
+      role:"un coach opérationnel",
+      context:"Je veux un plan réaliste, séquencé, avec livrables et jalons.",
+      inputs:"OBJECTIF :\n[COLLE ICI]\n\nCONTRAINTES :\n[COLLE ICI]",
+      constraints:"Plan en 4 phases max. Pour chaque phase : objectifs, actions, livrables, risques. Ton concis.",
+      success:"Plan actionnable, sans zones floues, avec dépendances et priorités.",
+      audience:"Équipe projet",
+      examples:"",
+      format:"plan",
+      tone:"direct"
+    },
+    code: {
+      goal:"Écris le code complet pour réaliser la fonctionnalité décrite ci-dessous.",
+      role:"un développeur senior",
+      context:"Je veux une solution simple, lisible et exécutable.",
+      inputs:"SPECS :\n[COLLE ICI]\n\nSTACK :\nHTML/CSS/JS (vanilla) ou autre",
+      constraints:"Fournis 1 fichier complet. Ajoute des commentaires. Explique comment exécuter. Pas de dépendances inutiles.",
+      success:"Code exécutable, structuré, sans erreurs, UX minimale.",
+      audience:"Développeur",
+      examples:"",
+      format:"code",
+      tone:"neutre"
+    },
+    brainstorm: {
+      goal:"Génère 20 idées créatives répondant au besoin ci-dessous, puis sélectionne les 5 meilleures.",
+      role:"un facilitateur de créativité",
+      context:"Je veux des idées variées et non évidentes.",
+      inputs:"BESOIN :\n[COLLE ICI]",
+      constraints:"Réponds en 2 parties : (1) 20 idées courtes (2) top 5 avec justification en 2 lignes chacune.",
+      success:"Idées originales, diversité, top 5 justifié.",
+      audience:"Équipe produit",
+      examples:"",
+      format:"bullets",
+      tone:"creatif"
+    }
+  };
+
+  // ---------- UI Bindings ----------
+  const fields = ["goal","role","context","inputs","constraints","success","audience","examples","format","tone"];
+  fields.forEach(id=>{
+    const el = $(id);
+    el.addEventListener("input", updateAll);
+    el.addEventListener("change", updateAll);
+  });
+
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      t.classList.add("active");
+      const tab = t.getAttribute("data-tab");
+      $("tab-score").style.display = tab==="score" ? "" : "none";
+      $("tab-suggest").style.display = tab==="suggest" ? "" : "none";
+      $("tab-examples").style.display = tab==="examples" ? "" : "none";
+    });
+  });
+
+  $("btnAsk3").addEventListener("click", () => {
+    const v = sanitize($("success").value);
+    if (!v.toLowerCase().includes("pose")) {
+      $("success").value = (v ? v + "\n" : "") + "Si des informations manquent, pose jusqu’à 3 questions courtes avant de répondre.";
+      updateAll();
+    }
+  });
+
+  $("btnAddSteps").addEventListener("click", () => {
+    const v = sanitize($("constraints").value);
+    if (!v.toLowerCase().includes("étapes")) {
+      $("constraints").value = (v ? v + "\n" : "") + "Réponds en étapes numérotées.";
+      updateAll();
+    }
+  });
+
+  $("btnCopy").addEventListener("click", async () => {
+    const text = $("finalPrompt").innerText;
+    try{
+      await navigator.clipboard.writeText(text);
+      $("btnCopy").innerText = "✅ Copié !";
+      setTimeout(()=> $("btnCopy").innerText = "Copier le prompt final", 1100);
+    }catch(e){
+      alert("Impossible de copier automatiquement. Sélectionne le texte et copie manuellement.");
+    }
+  });
+
+  $("btnReset").addEventListener("click", () => {
+    fields.forEach(id=>{
+      if (id==="format") $(id).value = "auto";
+      else if (id==="tone") $(id).value = "neutre";
+      else $(id).value = "";
+    });
+    state.demoIndex = 0;
+    updateAll();
+  });
+
+  $("btnLoadDemo").addEventListener("click", () => {
+    const d = demos[state.demoIndex % demos.length];
+    state.demoIndex++;
+    applyData(d);
+  });
+
+  document.querySelectorAll("[data-template]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const key = btn.getAttribute("data-template");
+      applyData(templates[key]);
+      // switch to builder/score tab
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      document.querySelector('.tab[data-tab="score"]').classList.add("active");
+      $("tab-score").style.display = "";
+      $("tab-suggest").style.display = "none";
+      $("tab-examples").style.display = "none";
+    });
+  });
+
+  $("btnExportTxt").addEventListener("click", () => {
+    downloadFile("prompt.txt", $("finalPrompt").innerText, "text/plain;charset=utf-8");
+  });
+
+  $("btnExportJson").addEventListener("click", () => {
+    const d = gatherData();
+    const payload = { meta:{ exported_at: nowISO(), app:"Prompt Coach" }, input:d, final_prompt: $("finalPrompt").innerText };
+    downloadFile("prompt.json", JSON.stringify(payload,null,2), "application/json;charset=utf-8");
+  });
+
+  function downloadFile(filename, content, mime){
+    const blob = new Blob([content], {type:mime});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename; a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 2000);
+  }
+
+  function gatherData(){
+    return {
+      goal: $("goal").value,
+      role: $("role").value,
+      context: $("context").value,
+      inputs: $("inputs").value,
+      constraints: $("constraints").value,
+      success: $("success").value,
+      audience: $("audience").value,
+      examples: $("examples").value,
+      format: $("format").value,
+      tone: $("tone").value
+    };
+  }
+
+  function applyData(d){
+    $("goal").value = d.goal || "";
+    $("role").value = d.role || "";
+    $("context").value = d.context || "";
+    $("inputs").value = d.inputs || "";
+    $("constraints").value = d.constraints || "";
+    $("success").value = d.success || "";
+    $("audience").value = d.audience || "";
+    $("examples").value = d.examples || "";
+    $("format").value = d.format || "auto";
+    $("tone").value = d.tone || "neutre";
+    updateAll();
+  }
+
+  // ---------- Anti-patterns text ----------
+  const antiPatternsText =
+`• “Fais-moi un truc bien” → pas d’objectif, pas de format, pas de critères
+• “Tu vois ce que je veux dire” → le modèle ne lit pas tes intentions implicites
+• “Comme tu veux” / “au choix” → ouvre trop l’espace de réponse
+• Aucun input (texte / données) → risque d’hallucination ou de généralités
+• Trop de demandes sans priorités → mélange, réponse superficielle
+• Format non imposé → structure aléatoire, difficile à réutiliser
+• Critères absents → impossible de juger si c’est “bon”`;
+
+  // ---------- Before / After examples ----------
+  function buildBeforeAfter(d){
+    const before = `Peux-tu m'aider ? Fais un texte sympa.`;
+    const after = synthesizePrompt({
+      goal: d.goal || "Rédige un livrable utile sur le sujet ci-dessous.",
+      role: d.role || "un assistant expert",
+      context: d.context || "Contexte : …",
+      inputs: d.inputs || "Entrées : …",
+      constraints: d.constraints || "Contraintes : …",
+      success: d.success || "Critères : …",
+      audience: d.audience || "",
+      examples: d.examples || "",
+      format: d.format || "auto",
+      tone: d.tone || "pro"
+    });
+
+    $("beforeEx").innerText = before;
+    $("afterEx").innerText = after;
+  }
+
+  // ---------- Update Loop ----------
+  function updateAll(){
+    const d = gatherData();
+    $("modePill").innerText = `Mode : ${d.format === "auto" ? "Général" : d.format.toUpperCase()}`;
+
+    // Score
+    const scored = scorePrompt(d);
+    $("scoreVal").innerText = `${scored.total}/100`;
+    $("kpiClarity").innerText = scored.clarity;
+    $("kpiConstraints").innerText = scored.constr;
+    $("kpiData").innerText = scored.data;
+
+    $("scoreBar").style.width = `${scored.total}%`;
+    const msg = scoreMessage(scored.total);
+    $("scoreMsg").innerText = msg.txt;
+
+    // Checklist completion
+    const missing = scored.missing;
+    state.checklist.forEach(c=>{
+      const chk = $("chk_" + c.key);
+      if (!chk) return;
+      chk.checked = !missing[c.key];
+    });
+
+    // Prompt final
+    $("finalPrompt").innerText = synthesizePrompt(d);
+
+    // Suggestions
+    const sug = buildSuggestions(d, scored);
+    renderSuggestions(sug);
+    $("antipatterns").innerText = antiPatternsText;
+
+    // Before/After
+    buildBeforeAfter(d);
+  }
+
+  // Init
+  buildChecklist();
+  $("antipatterns").innerText = antiPatternsText;
+  updateAll();
+})();
+</script>
+
+
+</body></html>
