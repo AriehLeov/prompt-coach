@@ -1,219 +1,1329 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Prompt Coach — by LEOV</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Prompt Coach — Bonnes pratiques (ChatGPT)</title>
 
-<style>
-:root{
-  --bg:#0b1020; --panel:#121a33; --text:#eaf0ff; --muted:#b9c3e6;
-  --accent:#4F46E5; --good:#4ade80; --warn:#fbbf24; --bad:#fb7185;
-  --border:rgba(255,255,255,.12); --radius:16px;
-  --sans:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-  --mono:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-}
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#121a33; --panel2:#0f1630; --text:#eaf0ff; --muted:#b9c3e6;
+      --accent:#7aa2ff; --good:#4ade80; --warn:#fbbf24; --bad:#fb7185; --border:rgba(255,255,255,.12);
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
 
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:radial-gradient(900px 500px at 30% -10%,rgba(79,70,229,.25),transparent 60%),var(--bg);
-  color:var(--text); font-family:var(--sans);
-}
+    /* =========================
+       LEOV BRANDING (V2)
+    ========================= */
+    :root{
+      /* Tu peux ajuster ici si besoin */
+      --leov-primary:#4F46E5;
+      --leov-secondary:#0F172A;
+      --leov-accent:#22C55E;
 
-a{color:inherit;text-decoration:none}
+      /* override accent existant */
+      --accent:var(--leov-primary);
+    }
 
-/* HEADER */
-header{
-  position:sticky;top:0;z-index:10;
-  display:flex;justify-content:space-between;align-items:center;
-  padding:14px 18px;border-bottom:1px solid var(--border);
-  background:linear-gradient(180deg,rgba(79,70,229,.25),rgba(11,16,32,.95));
-}
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 600px at 30% -10%, rgba(122,162,255,.25), transparent 60%),
+        radial-gradient(900px 500px at 90% 0%, rgba(74,222,128,.18), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      font-family:var(--sans);
+      line-height:1.35;
+    }
+    a{color:var(--accent); text-decoration:none}
+    .wrap{max-width:1200px;margin:0 auto;padding:28px 18px 80px}
+    header{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+    .title{display:flex;flex-direction:column;gap:6px}
+    h1{margin:0;font-size:22px;letter-spacing:.2px}
+    .sub{color:var(--muted);font-size:13px;max-width:760px}
+    .chiprow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .chip{border:1px solid var(--border);background:rgba(255,255,255,.05);padding:7px 10px;border-radius:999px;font-size:12px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:14px;margin-top:16px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
 
-.brand{display:flex;align-items:center;gap:12px}
-.brand img{height:28px}
-.brand b{font-size:15px}
-.brand span{font-size:12px;color:var(--muted)}
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden
+    }
+    .card h2{margin:0;font-size:14px;letter-spacing:.3px;text-transform:uppercase;color:rgba(234,240,255,.88)}
+    .card .hd{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .card .bd{padding:14px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .btn{
+      appearance:none;border:1px solid var(--border);
+      background:rgba(255,255,255,.05);
+      color:var(--text);
+      padding:9px 11px;border-radius:12px;cursor:pointer;font-size:13px
+    }
+    .btn:hover{background:rgba(255,255,255,.08)}
+    .btn.primary{border-color:rgba(122,162,255,.6);background:rgba(122,162,255,.15)}
+    .btn.good{border-color:rgba(74,222,128,.6);background:rgba(74,222,128,.12)}
+    .btn:active{transform:translateY(1px)}
+    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--border);font-size:12px;color:var(--muted)}
+    .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    @media (max-width:720px){.kpi{grid-template-columns:repeat(2,1fr)}}
+    .kpi .box{border:1px solid rgba(255,255,255,.09);background:rgba(0,0,0,.12);border-radius:14px;padding:10px}
+    .kpi .lab{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .kpi .val{font-size:18px;font-weight:700}
+    .bar{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid rgba(255,255,255,.09)}
+    .bar > div{height:100%;width:0%;background:linear-gradient(90deg,var(--bad),var(--warn),var(--good))}
+    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+    input[type="text"], textarea, select{
+      width:100%;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.18);
+      color:var(--text);
+      border-radius:14px;
+      padding:10px 11px;
+      outline:none;
+      font-size:13px
+    }
+    textarea{min-height:88px;resize:vertical}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:720px){.two{grid-template-columns:1fr}}
+    .checklist{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+    @media (max-width:900px){.checklist{grid-template-columns:1fr}}
+    .item{border:1px solid rgba(255,255,255,.09);background:rgba(0,0,0,.12);border-radius:14px;padding:10px;display:flex;gap:10px;align-items:flex-start}
+    .item input{margin-top:2px}
+    .item .t{font-weight:650;font-size:13px}
+    .item .d{font-size:12px;color:var(--muted);margin-top:2px}
+    .hint{font-size:12px;color:var(--muted);margin-top:8px}
+    .mono{font-family:var(--mono)}
+    .out{
+      white-space:pre-wrap;
+      word-break:break-word;
+      border:1px dashed rgba(255,255,255,.18);
+      background:rgba(0,0,0,.2);
+      border-radius:14px;
+      padding:12px;
+      font-size:12.5px;
+    }
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tab{padding:8px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.14);cursor:pointer;font-size:13px;color:var(--muted)}
+    .tab.active{border-color:rgba(122,162,255,.65);background:rgba(122,162,255,.16);color:var(--text)}
+    .examples{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:900px){.examples{grid-template-columns:1fr}}
+    .badge{font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.12);color:var(--muted)}
+    .footer{margin-top:16px;color:rgba(185,195,230,.85);font-size:12px}
+    .small{font-size:12px;color:var(--muted)}
 
-.actions{display:flex;gap:8px}
-.actions button,.actions a{
-  border:1px solid var(--border);background:rgba(255,255,255,.05);
-  color:var(--text);padding:8px 12px;border-radius:12px;cursor:pointer;
-}
+    /* ========== LEOV HEADER (V2) ========== */
+    .leov-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:14px 18px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(
+        180deg,
+        rgba(79,70,229,.18),
+        rgba(15,23,42,.96)
+      );
+      position:sticky;
+      top:0;
+      z-index:10;
+      backdrop-filter:saturate(120%) blur(8px);
+    }
+    .leov-brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:240px;
+    }
+    .leov-logo{
+      height:28px;
+      display:block;
+    }
+    .leov-brand a{display:flex;align-items:center;gap:12px}
+    .leov-title{font-weight:700;font-size:15px}
+    .leov-tagline{font-size:12px;color:var(--muted)}
 
-/* LAYOUT */
-.wrap{max-width:1200px;margin:0 auto;padding:24px}
-.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}
-@media(max-width:900px){.grid{grid-template-columns:1fr}}
-
-.card{
-  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
-  border:1px solid var(--border);border-radius:var(--radius);
-  padding:14px;
-}
-
-h2{margin:0 0 10px;font-size:14px;text-transform:uppercase}
-
-label{font-size:12px;color:var(--muted)}
-input,textarea,select{
-  width:100%;margin-top:4px;margin-bottom:10px;
-  background:rgba(0,0,0,.2);border:1px solid var(--border);
-  border-radius:12px;color:var(--text);
-  padding:10px;font-size:13px;
-}
-textarea{min-height:70px}
-
-.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.kpi div{background:rgba(0,0,0,.25);border-radius:12px;padding:10px;text-align:center}
-.kpi b{font-size:18px}
-
-.bar{height:10px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden}
-.bar div{height:100%;width:0%;background:linear-gradient(90deg,var(--bad),var(--warn),var(--good))}
-
-.output{
-  white-space:pre-wrap;font-family:var(--mono);
-  background:rgba(0,0,0,.3);border:1px dashed var(--border);
-  border-radius:12px;padding:12px;font-size:12.5px;
-  min-height:140px;
-}
-</style>
+    .leov-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .leov-actions a{
+      font-size:13px;
+      opacity:.88;
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.10);
+    }
+    .leov-actions a:hover{
+      opacity:1;
+      background:rgba(255,255,255,.06);
+    }
+    .langbtn{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.10);
+      color:var(--text);
+      padding:8px 10px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:13px;
+      opacity:.92;
+    }
+    .langbtn:hover{opacity:1;background:rgba(255,255,255,.06)}
+  </style>
 </head>
 
 <body>
 
-<header>
-  <div class="brand">
-    <a href="https://www.leov.co" target="_blank">
-      <img src="leov-logo.png" alt="LEOV"/>
-    </a>
-    <div>
-      <b>Prompt Coach</b><br/>
-      <span>by LEOV — Write clearer prompts</span>
-    </div>
-  </div>
-  <div class="actions">
-    <button id="langBtn">FR / EN</button>
-    <button id="resetBtn">Reset</button>
-    <button id="copyBtn">Copy prompt</button>
-  </div>
-</header>
-
-<div class="wrap">
-  <div class="grid">
-
-    <!-- BUILDER -->
-    <div class="card">
-      <h2>1) Prompt Builder</h2>
-
-      <label>Goal</label>
-      <input id="goal" placeholder="e.g. Write a professional follow-up email"/>
-
-      <label>Role</label>
-      <input id="role" placeholder="e.g. Act as a senior recruiter"/>
-
-      <label>Context</label>
-      <textarea id="context"></textarea>
-
-      <label>Inputs</label>
-      <textarea id="inputs"></textarea>
-
-      <label>Constraints</label>
-      <textarea id="constraints"></textarea>
-
-      <label>Success criteria</label>
-      <textarea id="success"></textarea>
-
-      <label>Output format</label>
-      <select id="format">
-        <option value="auto">Auto</option>
-        <option value="bullets">Bullets</option>
-        <option value="email">Email</option>
-        <option value="table">Table</option>
-      </select>
+  <!-- LEOV HEADER -->
+  <div class="leov-header">
+    <div class="leov-brand">
+      <!-- Logo cliquable -->
+      <a href="https://www.leov.co" target="_blank" rel="noopener noreferrer" title="Go to leov.co">
+        <img src="leov-logo.png" class="leov-logo" alt="LEOV" />
+        <div>
+          <div class="leov-title">
+            <span id="hdr_appname">Prompt Coach</span> <span style="opacity:.7">by LEOV</span>
+          </div>
+          <div class="leov-tagline" id="hdr_tagline">Write clearer prompts. Get better results.</div>
+        </div>
+      </a>
     </div>
 
-    <!-- RESULT -->
-    <div class="card">
-      <h2>2) Diagnostics & Final Prompt</h2>
+    <div class="leov-actions">
+      <a href="https://www.leov.co" target="_blank" rel="noopener noreferrer" id="hdr_site">Site LEOV</a>
+      <button class="langbtn" id="btnLang">FR / EN</button>
+    </div>
+  </div>
 
-      <div class="kpi">
-        <div><div>Score</div><b id="score">0</b></div>
-        <div><div>Clarity</div><b id="clarity">0</b></div>
-        <div><div>Constraints</div><b id="constr">0</b></div>
-        <div><div>Data</div><b id="data">0</b></div>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1 id="mainTitle">Prompt Coach — App interactive (bonnes pratiques de prompts pour ChatGPT)</h1>
+        <div class="sub" id="mainSub">
+          Objectif : t’aider à passer d’un prompt “flou” à un prompt <b>clair</b>, <b>contextualisé</b>, <b>contraint</b> et <b>testable</b>.
+          Remplis les champs → observe le score → applique les améliorations → copie le prompt final.
+        </div>
+        <div class="chiprow">
+          <span class="chip" id="chip1">✅ Contexte &amp; intention</span>
+          <span class="chip" id="chip2">✅ Contraintes (format, ton, longueur)</span>
+          <span class="chip" id="chip3">✅ Données / exemples</span>
+          <span class="chip" id="chip4">✅ Critères de succès</span>
+          <span class="chip" id="chip5">✅ Itération (questions manquantes)</span>
+        </div>
       </div>
 
-      <div style="margin:10px 0">
-        <div class="bar"><div id="bar"></div></div>
+      <div class="row">
+        <button class="btn primary" id="btnLoadDemo">Charger un exemple</button>
+        <button class="btn" id="btnReset">Réinitialiser</button>
+        <button class="btn good" id="btnCopy">Copier le prompt final</button>
       </div>
+    </header>
 
-      <label>Final prompt (copyable)</label>
-      <div class="output" id="finalPrompt"></div>
+    <div class="grid">
+      <!-- LEFT: Builder -->
+      <section class="card">
+        <div class="hd">
+          <h2 id="h2_builder">1) Constructeur de prompt</h2>
+          <span class="pill" id="modePill">Mode : Général</span>
+        </div>
+        <div class="bd">
+          <div class="two">
+            <div>
+              <label id="lbl_goal">Objectif (une phrase)</label>
+              <input type="text" id="goal" placeholder="Ex: Rédiger un email de relance professionnel…" />
+              <div class="hint" id="hint_goal">Astuce : commence par un verbe d’action (rédiger, analyser, comparer, résumer, proposer…).</div>
+            </div>
+            <div>
+              <label id="lbl_role">Rôle / posture demandée</label>
+              <input type="text" id="role" placeholder="Ex: Agis comme un recruteur senior / un tuteur / un coach…" />
+              <div class="hint" id="hint_role">Astuce : un rôle utile = compétence + angle (ex: “coach carrière orienté marché québécois”).</div>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <div class="two">
+            <div>
+              <label id="lbl_context">Contexte (qui / quoi / pourquoi)</label>
+              <textarea id="context" placeholder="Ex: Je postule à un poste de… J’ai ce parcours… Le but est de…"></textarea>
+            </div>
+            <div>
+              <label id="lbl_inputs">Entrées (données, texte, liste, contraintes métier)</label>
+              <textarea id="inputs" placeholder="Colle ici le texte à retravailler, un brief, des points clés, un tableau, etc."></textarea>
+              <div class="hint" id="hint_inputs">Astuce : plus tu fournis d’inputs concrets, moins le modèle “invente”.</div>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <div class="two">
+            <div>
+              <label id="lbl_format">Format de sortie</label>
+              <select id="format">
+                <option value="auto" id="opt_auto">Auto (à partir des contraintes)</option>
+                <option value="bullets" id="opt_bullets">Bullet points</option>
+                <option value="table" id="opt_table">Tableau</option>
+                <option value="email" id="opt_email">Email</option>
+                <option value="plan" id="opt_plan">Plan détaillé</option>
+                <option value="code" id="opt_code">Code (avec instructions)</option>
+                <option value="json" id="opt_json">JSON (schéma simple)</option>
+              </select>
+              <div class="hint" id="hint_format">Astuce : “donne-moi un tableau” = colonne/ordre/format des dates/unités.</div>
+            </div>
+
+            <div>
+              <label id="lbl_tone">Tonalité</label>
+              <select id="tone">
+                <option value="neutre" id="tone_neutre">Neutre</option>
+                <option value="pro" id="tone_pro">Professionnel</option>
+                <option value="direct" id="tone_direct">Direct &amp; concis</option>
+                <option value="pedago" id="tone_pedago">Pédagogique</option>
+                <option value="creatif" id="tone_creatif">Créatif</option>
+                <option value="humble" id="tone_humble">Empathique &amp; humble</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <div class="two">
+            <div>
+              <label id="lbl_constraints">Contraintes (longueur, langue, interdits, style…)</label>
+              <textarea id="constraints" placeholder="Ex: 180–220 mots, français, pas de jargon, 3 options, pas de flatterie excessive…"></textarea>
+            </div>
+            <div>
+              <label id="lbl_success">Critères de succès (comment juger que c’est bon ?)</label>
+              <textarea id="success" placeholder="Ex: doit être actionnable, clair, pas d’hypothèses, inclure 3 étapes et un CTA…"></textarea>
+              <div class="hint" id="hint_success">Astuce : ajoute “si info manquante → pose 3 questions max”.</div>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <div class="two">
+            <div>
+              <label id="lbl_audience">Audience cible</label>
+              <input type="text" id="audience" placeholder="Ex: un directeur RH, un client, des enfants de 6–10 ans…" />
+            </div>
+            <div>
+              <label id="lbl_examples">Exemple (optionnel) : “ce que j’aime / n’aime pas”</label>
+              <textarea id="examples" placeholder="Ex: j’aime des phrases courtes, un ton factuel; je n’aime pas les généralités…"></textarea>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <div class="checklist" id="checklist"></div>
+
+          <div class="row" style="margin-top:12px;justify-content:space-between">
+            <div class="small" id="realtimeMsg">🔁 Tout est recalculé en temps réel (score + recommandations).</div>
+            <div class="row">
+              <button class="btn" id="btnAsk3">Ajouter “pose 3 questions si manque”</button>
+              <button class="btn" id="btnAddSteps">Ajouter “réponds en étapes”</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Score + Output -->
+      <aside class="card">
+        <div class="hd">
+          <h2 id="h2_diag">2) Diagnostic &amp; prompt final</h2>
+          <div class="tabs">
+            <div class="tab active" data-tab="score" id="tabScore">Score</div>
+            <div class="tab" data-tab="suggest" id="tabSuggest">Suggestions</div>
+            <div class="tab" data-tab="examples" id="tabExamples">Avant / Après</div>
+          </div>
+        </div>
+
+        <div class="bd" id="tab-score">
+          <div class="kpi">
+            <div class="box">
+              <div class="lab" id="labScore">Score prompt</div>
+              <div class="val" id="scoreVal">0/100</div>
+            </div>
+            <div class="box">
+              <div class="lab" id="labClarity">Clarté</div>
+              <div class="val" id="kpiClarity">0</div>
+            </div>
+            <div class="box">
+              <div class="lab" id="labConstraints">Contraintes</div>
+              <div class="val" id="kpiConstraints">0</div>
+            </div>
+            <div class="box">
+              <div class="lab" id="labData">Données</div>
+              <div class="val" id="kpiData">0</div>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+          <div class="bar"><div id="scoreBar" style="width: 0%;"></div></div>
+          <div class="hint" id="scoreMsg">Faible : prompt trop vague. Commence par objectif + contexte + format + contraintes.</div>
+
+          <div style="height:12px"></div>
+          <label id="lbl_final">Prompt final (copiable)</label>
+          <div class="out mono" id="finalPrompt"></div>
+
+          <div class="row" style="margin-top:10px;justify-content:space-between">
+            <button class="btn" id="btnExportTxt">Exporter .txt</button>
+            <button class="btn" id="btnExportJson">Exporter .json</button>
+          </div>
+
+          <div class="footer" id="footerMsg">
+            Rappel : un bon prompt = <b>intention</b> + <b>contexte</b> + <b>inputs</b> + <b>contraintes</b> + <b>format</b> + <b>critères</b>.
+          </div>
+        </div>
+
+        <div class="bd" id="tab-suggest" style="display:none">
+          <label id="lbl_recos">Recommandations concrètes (priorisées)</label>
+          <div id="suggestions"></div>
+
+          <div style="height:10px"></div>
+          <label id="lbl_anti">“Anti-patterns” fréquents</label>
+          <div class="out" id="antipatterns"></div>
+        </div>
+
+        <div class="bd" id="tab-examples" style="display:none">
+          <div class="examples">
+            <div>
+              <div class="row" style="justify-content:space-between;margin-bottom:6px">
+                <label id="lbl_before">Prompt “avant” (trop vague)</label>
+                <span class="badge" id="badge_before">Flou / Non testable</span>
+              </div>
+              <div class="out mono" id="beforeEx"></div>
+            </div>
+            <div>
+              <div class="row" style="justify-content:space-between;margin-bottom:6px">
+                <label id="lbl_after">Prompt “après” (amélioré)</label>
+                <span class="badge" id="badge_after">Contraint / Actionnable</span>
+              </div>
+              <div class="out mono" id="afterEx"></div>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+          <label id="lbl_templates">Templates rapides</label>
+          <div class="row" style="gap:8px;flex-wrap:wrap">
+            <button class="btn" data-template="rewrite" id="tpl_rewrite">Réécriture</button>
+            <button class="btn" data-template="analysis" id="tpl_analysis">Analyse</button>
+            <button class="btn" data-template="plan" id="tpl_plan">Plan</button>
+            <button class="btn" data-template="code" id="tpl_code">Code</button>
+            <button class="btn" data-template="brainstorm" id="tpl_brainstorm">Brainstorm</button>
+          </div>
+          <div class="hint" id="tpl_hint">Clique un template → il pré-remplit le builder avec une structure de prompt.</div>
+        </div>
+      </aside>
     </div>
-
   </div>
-</div>
 
 <script>
-const $ = id => document.getElementById(id);
-const fields = ["goal","role","context","inputs","constraints","success","format"];
+(() => {
+  // ---------- Helpers ----------
+  const $ = (id) => document.getElementById(id);
+  const sanitize = (s) => (s || "").toString().trim();
+  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+  const nowISO = () => new Date().toISOString();
 
-function synthesize(){
-  const g=$("goal").value.trim();
-  const r=$("role").value.trim();
-  const c=$("context").value.trim();
-  const i=$("inputs").value.trim();
-  const k=$("constraints").value.trim();
-  const s=$("success").value.trim();
-  const f=$("format").value;
+  // ---------- i18n ----------
+  let lang = "fr"; // "fr" or "en"
 
-  let txt="";
-  if(r) txt+=`You are ${r}.\n`;
-  if(g) txt+=`\n# Task\n${g}\n`;
-  if(c) txt+=`\n## Context\n${c}\n`;
-  if(i) txt+=`\n## Inputs\n${i}\n`;
-  if(k) txt+=`\n## Constraints\n${k}\n`;
-  if(f!=="auto") txt+=`\n## Output format\n${f}\n`;
-  if(s) txt+=`\n## Success criteria\n${s}\n`;
+  const I18N = {
+    fr: {
+      docTitle: "Prompt Coach — Bonnes pratiques (ChatGPT)",
+      hdrTagline: "Write clearer prompts. Get better results.",
+      hdrSite: "Site LEOV",
+      mainTitle: "Prompt Coach — App interactive (bonnes pratiques de prompts pour ChatGPT)",
+      mainSub: `Objectif : t’aider à passer d’un prompt “flou” à un prompt <b>clair</b>, <b>contextualisé</b>, <b>contraint</b> et <b>testable</b>.
+               Remplis les champs → observe le score → applique les améliorations → copie le prompt final.`,
+      chips: [
+        "✅ Contexte & intention",
+        "✅ Contraintes (format, ton, longueur)",
+        "✅ Données / exemples",
+        "✅ Critères de succès",
+        "✅ Itération (questions manquantes)"
+      ],
+      btnLoadDemo: "Charger un exemple",
+      btnReset: "Réinitialiser",
+      btnCopy: "Copier le prompt final",
+      builderTitle: "1) Constructeur de prompt",
+      diagTitle: "2) Diagnostic & prompt final",
+      labels: {
+        goal: "Objectif (une phrase)",
+        role: "Rôle / posture demandée",
+        context: "Contexte (qui / quoi / pourquoi)",
+        inputs: "Entrées (données, texte, liste, contraintes métier)",
+        format: "Format de sortie",
+        tone: "Tonalité",
+        constraints: "Contraintes (longueur, langue, interdits, style…)",
+        success: "Critères de succès (comment juger que c’est bon ?)",
+        audience: "Audience cible",
+        examples: "Exemple (optionnel) : “ce que j’aime / n’aime pas”",
+        final: "Prompt final (copiable)",
+        recos: "Recommandations concrètes (priorisées)",
+        anti: "“Anti-patterns” fréquents",
+        before: "Prompt “avant” (trop vague)",
+        after: "Prompt “après” (amélioré)",
+        templates: "Templates rapides",
+      },
+      hints: {
+        goal: "Astuce : commence par un verbe d’action (rédiger, analyser, comparer, résumer, proposer…).",
+        role: "Astuce : un rôle utile = compétence + angle (ex: “coach carrière orienté marché québécois”).",
+        inputs: "Astuce : plus tu fournis d’inputs concrets, moins le modèle “invente”.",
+        format: "Astuce : “donne-moi un tableau” = colonne/ordre/format des dates/unités.",
+        success: "Astuce : ajoute “si info manquante → pose 3 questions max”.",
+        templates: "Clique un template → il pré-remplit le builder avec une structure de prompt."
+      },
+      realtimeMsg: "🔁 Tout est recalculé en temps réel (score + recommandations).",
+      btnAsk3: "Ajouter “pose 3 questions si manque”",
+      btnAddSteps: "Ajouter “réponds en étapes”",
+      tabs: { score:"Score", suggest:"Suggestions", examples:"Avant / Après" },
+      kpi: { score:"Score prompt", clarity:"Clarté", constraints:"Contraintes", data:"Données" },
+      footer: `Rappel : un bon prompt = <b>intention</b> + <b>contexte</b> + <b>inputs</b> + <b>contraintes</b> + <b>format</b> + <b>critères</b>.`,
+      badges: { before:"Flou / Non testable", after:"Contraint / Actionnable" },
+      exportTxt: "Exporter .txt",
+      exportJson: "Exporter .json",
+      copyOk: "✅ Copié !",
+      copyDefault: "Copier le prompt final",
+      formatOpts: {
+        auto: "Auto (à partir des contraintes)",
+        bullets: "Bullet points",
+        table: "Tableau",
+        email: "Email",
+        plan: "Plan détaillé",
+        code: "Code (avec instructions)",
+        json: "JSON (schéma simple)"
+      },
+      toneOpts: {
+        neutre: "Neutre",
+        pro: "Professionnel",
+        direct: "Direct & concis",
+        pedago: "Pédagogique",
+        creatif: "Créatif",
+        humble: "Empathique & humble"
+      },
+      placeholders: {
+        goal: "Ex: Rédiger un email de relance professionnel…",
+        role: "Ex: Agis comme un recruteur senior / un tuteur / un coach…",
+        context: "Ex: Je postule à un poste de… J’ai ce parcours… Le but est de…",
+        inputs: "Colle ici le texte à retravailler, un brief, des points clés, un tableau, etc.",
+        constraints: "Ex: 180–220 mots, français, pas de jargon, 3 options, pas de flatterie excessive…",
+        success: "Ex: doit être actionnable, clair, pas d’hypothèses, inclure 3 étapes et un CTA…",
+        audience: "Ex: un directeur RH, un client, des enfants de 6–10 ans…",
+        examples: "Ex: j’aime des phrases courtes, un ton factuel; je n’aime pas les généralités…"
+      }
+    },
 
-  txt+=`\n## Guardrails\n- Ask up to 3 questions if information is missing.\n- Do not invent facts.\n`;
+    en: {
+      docTitle: "Prompt Coach — Best practices (ChatGPT)",
+      hdrTagline: "Write clearer prompts. Get better results.",
+      hdrSite: "LEOV website",
+      mainTitle: "Prompt Coach — Interactive app (ChatGPT prompting best practices)",
+      mainSub: `Goal: help you go from a “vague” prompt to a <b>clear</b>, <b>context-rich</b>, <b>constrained</b> and <b>testable</b> prompt.
+               Fill the fields → check the score → apply improvements → copy the final prompt.`,
+      chips: [
+        "✅ Context & intent",
+        "✅ Constraints (format, tone, length)",
+        "✅ Data / examples",
+        "✅ Success criteria",
+        "✅ Iteration (missing questions)"
+      ],
+      btnLoadDemo: "Load an example",
+      btnReset: "Reset",
+      btnCopy: "Copy final prompt",
+      builderTitle: "1) Prompt builder",
+      diagTitle: "2) Diagnostics & final prompt",
+      labels: {
+        goal: "Goal (one sentence)",
+        role: "Requested role / stance",
+        context: "Context (who / what / why)",
+        inputs: "Inputs (data, text, list, business constraints)",
+        format: "Output format",
+        tone: "Tone",
+        constraints: "Constraints (length, language, do/don’t, style…)",
+        success: "Success criteria (how to judge it’s good?)",
+        audience: "Target audience",
+        examples: "Example (optional): what I like / dislike",
+        final: "Final prompt (copyable)",
+        recos: "Actionable recommendations (prioritized)",
+        anti: "Common anti-patterns",
+        before: "“Before” prompt (too vague)",
+        after: "“After” prompt (improved)",
+        templates: "Quick templates",
+      },
+      hints: {
+        goal: "Tip: start with an action verb (write, analyze, compare, summarize, propose…).",
+        role: "Tip: a useful role = expertise + angle (e.g., “career coach for Québec market”).",
+        inputs: "Tip: the more concrete inputs you provide, the less the model “invents”.",
+        format: "Tip: “give me a table” → specify columns/order/units.",
+        success: "Tip: add “if info is missing → ask up to 3 questions first”.",
+        templates: "Click a template → it pre-fills the builder with a strong structure."
+      },
+      realtimeMsg: "🔁 Everything updates in real time (score + recommendations).",
+      btnAsk3: "Add “ask up to 3 questions if missing info”",
+      btnAddSteps: "Add “answer in numbered steps”",
+      tabs: { score:"Score", suggest:"Suggestions", examples:"Before / After" },
+      kpi: { score:"Prompt score", clarity:"Clarity", constraints:"Constraints", data:"Data" },
+      footer: `Reminder: a good prompt = <b>intent</b> + <b>context</b> + <b>inputs</b> + <b>constraints</b> + <b>format</b> + <b>criteria</b>.`,
+      badges: { before:"Vague / Not testable", after:"Constrained / Actionable" },
+      exportTxt: "Export .txt",
+      exportJson: "Export .json",
+      copyOk: "✅ Copied!",
+      copyDefault: "Copy final prompt",
+      formatOpts: {
+        auto: "Auto (from constraints)",
+        bullets: "Bullet points",
+        table: "Table",
+        email: "Email",
+        plan: "Detailed plan",
+        code: "Code (with instructions)",
+        json: "JSON (simple schema)"
+      },
+      toneOpts: {
+        neutre: "Neutral",
+        pro: "Professional",
+        direct: "Direct & concise",
+        pedago: "Educational",
+        creatif: "Creative",
+        humble: "Empathetic & humble"
+      },
+      placeholders: {
+        goal: "e.g., Write a professional follow-up email…",
+        role: "e.g., Act as a senior recruiter / tutor / coach…",
+        context: "e.g., I’m applying for… My background is… The goal is…",
+        inputs: "Paste the text to rewrite, a brief, key points, a table, etc.",
+        constraints: "e.g., 180–220 words, English, no jargon, 3 options, no excessive flattery…",
+        success: "e.g., must be actionable, clear, no assumptions, include 3 steps and a CTA…",
+        audience: "e.g., HR Director, a client, kids aged 6–10…",
+        examples: "e.g., I like short sentences, factual tone; I dislike generic advice…"
+      }
+    }
+  };
 
-  return txt || "Fill at least one field to generate the prompt.";
-}
+  // ---------- State ----------
+  const state = {
+    demoIndex: 0,
+    checklist: [
+      { key:"goal", title:{fr:"Objectif explicite", en:"Clear goal"}, desc:{fr:"Le modèle sait exactement quoi produire.", en:"The model knows exactly what to produce."} },
+      { key:"role", title:{fr:"Rôle / posture", en:"Role / stance"}, desc:{fr:"Tu imposes une expertise et un angle (coach, tuteur, analyste…).", en:"You force an expertise and angle (coach, tutor, analyst…)."} },
+      { key:"context", title:{fr:"Contexte suffisant", en:"Sufficient context"}, desc:{fr:"Qui/quoi/pourquoi + contraintes de situation.", en:"Who/what/why + situation constraints."} },
+      { key:"inputs", title:{fr:"Inputs concrets", en:"Concrete inputs"}, desc:{fr:"Texte, données, exemples, éléments à respecter.", en:"Text, data, examples, things to respect."} },
+      { key:"constraints", title:{fr:"Contraintes", en:"Constraints"}, desc:{fr:"Longueur, langue, interdits, style, nombre d’options…", en:"Length, language, do/don’t, style, number of options…"} },
+      { key:"format", title:{fr:"Format de sortie", en:"Output format"}, desc:{fr:"Tu réduis les ambiguïtés (tableau, étapes, email…).", en:"You reduce ambiguity (table, steps, email…)."} },
+      { key:"success", title:{fr:"Critères de succès", en:"Success criteria"}, desc:{fr:"Comment juger la réponse + ‘pose questions si manque’.", en:"How to judge the answer + ‘ask questions if missing’."} }
+    ]
+  };
 
-function update(){
-  const txt=synthesize();
-  $("finalPrompt").innerText=txt;
+  const $id = (id) => document.getElementById(id);
 
-  let score=0;
-  score+= $("goal").value?25:0;
-  score+= $("context").value?25:0;
-  score+= $("inputs").value?25:0;
-  score+= $("constraints").value?25:0;
+  // ---------- Checklist UI ----------
+  function buildChecklist(){
+    const box = $id("checklist");
+    box.innerHTML = "";
+    state.checklist.forEach((c, idx) => {
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <input type="checkbox" id="chk_${c.key}" disabled />
+        <div>
+          <div class="t">${idx+1}. ${(lang==="fr") ? c.title.fr : c.title.en}</div>
+          <div class="d">${(lang==="fr") ? c.desc.fr : c.desc.en}</div>
+        </div>
+      `;
+      box.appendChild(div);
+    });
+  }
 
-  $("score").innerText=score;
-  $("clarity").innerText=$("goal").value?25:0;
-  $("constr").innerText=$("constraints").value?25:0;
-  $("data").innerText=$("inputs").value?25:0;
-  $("bar").style.width=score+"%";
-}
+  // ---------- Scoring ----------
+  function scorePrompt(d){
+    const goal = sanitize(d.goal), role = sanitize(d.role), ctx = sanitize(d.context), inputs = sanitize(d.inputs);
+    const constraints = sanitize(d.constraints), success = sanitize(d.success), audience = sanitize(d.audience);
+    const examples = sanitize(d.examples);
 
-fields.forEach(id=>{
-  $(id).addEventListener("input",update);
-  $(id).addEventListener("change",update);
-});
+    let clarity = 0, constr = 0, data = 0, test = 0;
 
-$("resetBtn").onclick=()=>{
-  fields.forEach(id=>$(id).value="");
-  update();
-};
+    if (goal.length >= 12) clarity += 12;
+    if (goal.length >= 35) clarity += 6;
+    if (role.length >= 8) clarity += 5;
+    if (audience.length >= 5) clarity += 2;
 
-$("copyBtn").onclick=()=>{
-  navigator.clipboard.writeText($("finalPrompt").innerText);
-};
+    if (constraints.length >= 10) constr += 10;
+    if (constraints.match(/\b(mots|words|caract|chars|bullet|tableau|table|json|title|titre|sections?)\b/i)) constr += 6;
+    if (constraints.match(/\b(ne pas|éviter|interdit|sans|avoid|don'?t|do not|no)\b/i)) constr += 4;
+    if (d.format && d.format !== "auto") constr += 5;
 
-update(); // ✅ IMPORTANT : render initial
+    if (ctx.length >= 25) data += 8;
+    if (ctx.length >= 90) data += 5;
+    if (inputs.length >= 20) data += 10;
+    if (inputs.length >= 120) data += 5;
+    if (examples.length >= 20) data += 2;
+
+    if (success.length >= 15) test += 10;
+    if (success.match(/\b(critère|criteria|doit|must|should|succès|success|validation|acceptable)\b/i)) test += 6;
+    if ((success + " " + constraints).match(/\b(if|si|s'il)\b.*\b(missing|manque|incomplet|info)\b.*\b(question)\b/i)) test += 6;
+    if ((success + " " + constraints).match(/\b(étapes|steps?|checklist|plan)\b/i)) test += 3;
+
+    clarity = clamp(clarity,0,25);
+    constr  = clamp(constr,0,25);
+    data    = clamp(data,0,25);
+    test    = clamp(test,0,25);
+
+    const total = clarity + constr + data + test;
+    const missing = {
+      goal: goal.length < 12,
+      role: role.length < 8,
+      context: ctx.length < 25,
+      inputs: inputs.length < 20,
+      constraints: constraints.length < 10,
+      format: !d.format || d.format === "auto",
+      success: success.length < 15
+    };
+
+    return { total, clarity, constr, data, test, missing };
+  }
+
+  function scoreMessage(total){
+    if (lang==="fr"){
+      if (total >= 85) return { txt:"Excellent : prompt très contraint et actionnable. Tu peux itérer sur le style.", mood:"good" };
+      if (total >= 70) return { txt:"Solide : il manque surtout des détails (inputs/contraintes) pour éviter les ambiguïtés.", mood:"warn" };
+      if (total >= 50) return { txt:"Moyen : trop d’espace d’interprétation. Ajoute format + critères + données concrètes.", mood:"warn" };
+      return { txt:"Faible : prompt trop vague. Commence par objectif + contexte + format + contraintes.", mood:"bad" };
+    }else{
+      if (total >= 85) return { txt:"Excellent: very constrained and actionable. You can now refine style.", mood:"good" };
+      if (total >= 70) return { txt:"Solid: mostly missing details (inputs/constraints) to avoid ambiguity.", mood:"warn" };
+      if (total >= 50) return { txt:"Average: too much room for interpretation. Add format + criteria + concrete data.", mood:"warn" };
+      return { txt:"Low: prompt is too vague. Start with goal + context + format + constraints.", mood:"bad" };
+    }
+  }
+
+  // ---------- Prompt synthesis ----------
+  function formatBlock(label, content){
+    content = sanitize(content);
+    if (!content) return "";
+    return `## ${label}\n${content}\n\n`;
+  }
+
+  function formatHintFromSelect(format){
+    if (lang==="fr"){
+      switch(format){
+        case "bullets": return "Réponds en bullet points.";
+        case "table": return "Réponds sous forme de tableau (colonnes claires).";
+        case "email": return "Rédige un email complet (objet + corps + signature).";
+        case "plan": return "Propose un plan détaillé (niveaux 1/2/3).";
+        case "code": return "Fournis du code complet, exécutable, avec commentaires et étapes.";
+        case "json": return "Réponds uniquement en JSON valide (sans texte autour).";
+        default: return "";
+      }
+    }else{
+      switch(format){
+        case "bullets": return "Answer in bullet points.";
+        case "table": return "Answer as a table (clear columns).";
+        case "email": return "Write a complete email (subject + body + signature).";
+        case "plan": return "Provide a detailed plan (levels 1/2/3).";
+        case "code": return "Provide complete, runnable code with comments and steps.";
+        case "json": return "Answer ONLY with valid JSON (no surrounding text).";
+        default: return "";
+      }
+    }
+  }
+
+  function synthesizePrompt(d){
+    const goal = sanitize(d.goal);
+    const role = sanitize(d.role);
+    const tone = sanitize(d.tone || (lang==="fr" ? "neutre" : "neutral"));
+    const audience = sanitize(d.audience);
+    const ctx = sanitize(d.context);
+    const inputs = sanitize(d.inputs);
+    const constraints = sanitize(d.constraints);
+    const success = sanitize(d.success);
+    const examples = sanitize(d.examples);
+    const format = d.format || "auto";
+
+    const fmtHint = (format !== "auto") ? formatHintFromSelect(format) : "";
+
+    let header = "";
+    if (role) header += (lang==="fr" ? `Tu es ${role}.\n` : `You are ${role}.\n`);
+    if (tone) header += (lang==="fr" ? `Ton : ${tone}.\n` : `Tone: ${tone}.\n`);
+    if (audience) header += (lang==="fr" ? `Audience cible : ${audience}.\n` : `Target audience: ${audience}.\n`);
+
+    let core = "";
+    if (goal) core += (lang==="fr" ? `# Tâche\n${goal}\n\n` : `# Task\n${goal}\n\n`);
+
+    core += formatBlock(lang==="fr" ? "Contexte" : "Context", ctx);
+    core += formatBlock(lang==="fr" ? "Entrées" : "Inputs", inputs);
+    core += formatBlock(lang==="fr" ? "Contraintes" : "Constraints", constraints || "");
+    if (fmtHint) core += `## ${lang==="fr" ? "Format de sortie" : "Output format"}\n${fmtHint}\n\n`;
+    core += formatBlock(lang==="fr" ? "Critères de succès" : "Success criteria", success);
+    core += formatBlock(lang==="fr" ? "Préférences / exemples" : "Preferences / examples", examples);
+
+    const guard = (lang==="fr")
+      ? `## Garde-fous\n- Si une information importante manque, pose jusqu’à 3 questions courtes avant de répondre.\n- N’invente pas de faits : si tu dois supposer, explicite l’hypothèse.\n`
+      : `## Guardrails\n- If critical information is missing, ask up to 3 short questions before answering.\n- Do not invent facts: if you must assume, state your assumptions explicitly.\n`;
+
+    return `${header}\n${core}${guard}`.trim();
+  }
+
+  // ---------- Suggestions ----------
+  function buildSuggestions(d, scored){
+    const s = [];
+    const fr = (lang==="fr");
+
+    if (scored.missing.goal) s.push({p:1, t: fr?"Clarifie l’objectif":"Clarify the goal", d: fr?"Réécris l’objectif en 1 phrase action : verbe + livrable + sujet.":"Rewrite the goal in 1 action sentence: verb + deliverable + topic."});
+    if (scored.missing.context) s.push({p:2, t: fr?"Ajoute un contexte minimal":"Add minimal context", d: fr?"Qui ? Dans quel cadre ? Pourquoi maintenant ? 2–5 lignes suffisent.":"Who? In what context? Why now? 2–5 lines are enough."});
+    if (scored.missing.inputs) s.push({p:3, t: fr?"Fournis des inputs concrets":"Provide concrete inputs", d: fr?"Colle le texte/données à transformer, ou liste les faits à respecter.":"Paste the text/data to transform, or list facts to respect."});
+    if (scored.missing.constraints) s.push({p:4, t: fr?"Spécifie des contraintes":"Specify constraints", d: fr?"Longueur, langue, style, interdits, nombre d’options, niveau de détail.":"Length, language, style, do/don’t, number of options, detail level."});
+    if (scored.missing.format) s.push({p:5, t: fr?"Force un format de sortie":"Force an output format", d: fr?"Choisis un format (tableau, étapes, email, JSON…) et précise la structure.":"Pick a format (table, steps, email, JSON…) and specify structure."});
+    if (scored.missing.success) s.push({p:6, t: fr?"Ajoute des critères de succès":"Add success criteria", d: fr?"Écris 3–5 critères mesurables (doit inclure…, éviter…, ton…, CTA…).":"Write 3–5 measurable criteria (must include…, avoid…, tone…, CTA…)."});
+    if (!sanitize(d.role)) s.push({p:7, t: fr?"Définis un rôle utile":"Define a useful role", d: fr?"“Agis comme …” (expertise + angle).":"“Act as …” (expertise + angle)."});
+
+    const merged = (sanitize(d.goal) + " " + sanitize(d.context) + " " + sanitize(d.constraints) + " " + sanitize(d.success)).toLowerCase();
+    if (merged.includes(fr?"fait moi":"do this") && merged.length < 80) s.push({p:8, t: fr?"Trop court = trop flou":"Too short = too vague", d: fr?"Ajoute contexte + contraintes pour réduire l’ambiguïté.":"Add context + constraints to reduce ambiguity."});
+    if (merged.match(/\bcomme tu veux|au choix|peu importe|whatever|any way|as you like\b/)) s.push({p:9, t: fr?"Évite “au choix / peu importe”":"Avoid “whatever / as you like”", d: fr?"Remplace par des préférences ou des critères.":"Replace with preferences or criteria."});
+
+    s.sort((a,b)=>a.p-b.p);
+    return s;
+  }
+
+  function renderSuggestions(list){
+    const box = $id("suggestions");
+    if (!list.length){
+      box.innerHTML = `<div class="out">✅ ${(lang==="fr") ? "Rien de critique à corriger. Tu peux optimiser le style." : "Nothing critical to fix. You can now refine style."}</div>`;
+      return;
+    }
+    box.innerHTML = list.map(x => `
+      <div class="item" style="margin-bottom:10px">
+        <div class="badge">P${x.p}</div>
+        <div>
+          <div class="t">${x.t}</div>
+          <div class="d">${x.d}</div>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  // ---------- Demos / Templates (FR + EN) ----------
+  const demos_fr = [
+    {
+      name:"Email relance",
+      goal:"Rédige un email de relance pour obtenir une réponse à une candidature envoyée il y a 10 jours.",
+      role:"un recruteur senior (ton professionnel, respectueux, orienté action)",
+      context:"J’ai postulé à un poste de Directeur Transformation. Je veux relancer sans insister, tout en rappelant ma valeur.",
+      inputs:"Nom du recruteur : Sophie Martin\nEntreprise : ExempleCorp\nPoste : Directeur Transformation\nDate d’envoi candidature : il y a 10 jours\nPoint fort à rappeler : 10+ ans de programmes de transformation, leadership, delivery.",
+      constraints:"En français. 140–170 mots. 1 objet d’email. Pas de flatterie excessive. Inclure une proposition de créneau de 15 min.",
+      success:"Doit être clair, poli, et donner envie de répondre. Inclure 1 phrase de rappel de valeur et 1 CTA concret.",
+      audience:"Recruteur / Talent Acquisition",
+      examples:"J’aime un style simple, phrases courtes, pas de jargon.",
+      format:"email",
+      tone:"pro"
+    },
+    {
+      name:"Analyse de texte",
+      goal:"Analyse ce texte et identifie 5 améliorations concrètes (structure, clarté, arguments).",
+      role:"un tuteur d’écriture académique",
+      context:"Je prépare un devoir et j’ai besoin d’un diagnostic actionnable.",
+      inputs:"[COLLE ICI TON TEXTE]\n\n(ou un extrait de 2–3 paragraphes)",
+      constraints:"En français. Réponse en 2 parties : (1) diagnostic (2) recommandations. Chaque recommandation doit inclure un exemple de reformulation.",
+      success:"Doit être précis, non vague, et applicable immédiatement.",
+      audience:"Étudiant / professeur",
+      examples:"",
+      format:"bullets",
+      tone:"pedago"
+    }
+  ];
+
+  const demos_en = [
+    {
+      name:"Follow-up email",
+      goal:"Write a follow-up email to get a response to a job application sent 10 days ago.",
+      role:"a senior recruiter (professional, respectful, action-oriented)",
+      context:"I applied for a Director of Transformation role. I want to follow up without pushing, while reminding my value.",
+      inputs:"Recruiter name: Sophie Martin\nCompany: ExampleCorp\nRole: Director of Transformation\nApplication date: 10 days ago\nStrength to highlight: 10+ years leading transformation programs, leadership, delivery.",
+      constraints:"In English. 140–170 words. 1 email subject line. No excessive flattery. Include a proposal for a 15-min slot.",
+      success:"Must be clear, polite, and encourage a reply. Include 1 value reminder sentence and 1 concrete CTA.",
+      audience:"Recruiter / Talent Acquisition",
+      examples:"I like simple style, short sentences, no jargon.",
+      format:"email",
+      tone:"pro"
+    },
+    {
+      name:"Text analysis",
+      goal:"Analyze this text and identify 5 concrete improvements (structure, clarity, arguments).",
+      role:"an academic writing tutor",
+      context:"I’m preparing an assignment and need an actionable diagnosis.",
+      inputs:"[PASTE YOUR TEXT HERE]\n\n(or 2–3 paragraphs excerpt)",
+      constraints:"In English. Answer in 2 parts: (1) diagnosis (2) recommendations. Each recommendation must include a rewrite example.",
+      success:"Must be specific, not vague, and immediately applicable.",
+      audience:"Student / professor",
+      examples:"",
+      format:"bullets",
+      tone:"pedago"
+    }
+  ];
+
+  const templates_fr = {
+    rewrite: {
+      goal:"Réécris le texte ci-dessous pour qu’il soit plus clair et plus convaincant.",
+      role:"un éditeur professionnel",
+      context:"Je veux conserver le sens, améliorer la structure et la fluidité.",
+      inputs:"TEXTE À RÉÉCRIRE :\n[COLLE ICI]",
+      constraints:"En français. Conserver les faits. Réduire de 15–25%. Phrases plus courtes. Pas de jargon.",
+      success:"Texte plus lisible, même message, meilleur rythme. Propose aussi 3 alternatives de titre.",
+      audience:"Grand public",
+      examples:"J’aime un style simple et direct.",
+      format:"auto",
+      tone:"pro"
+    },
+    analysis: {
+      goal:"Analyse la situation et propose 3 options avec avantages/inconvénients et une recommandation finale.",
+      role:"un consultant stratégique",
+      context:"Je dois prendre une décision et je veux un raisonnement structuré.",
+      inputs:"CONTEXTE & DONNÉES :\n[COLLE ICI]",
+      constraints:"Réponds en tableau pour les options, puis une recommandation en 5–7 lignes. N’invente pas de données.",
+      success:"Options distinctes, critères explicites, recommandation argumentée.",
+      audience:"Décideur",
+      examples:"",
+      format:"table",
+      tone:"pro"
+    },
+    plan: {
+      goal:"Construis un plan détaillé pour atteindre l’objectif ci-dessous.",
+      role:"un coach opérationnel",
+      context:"Je veux un plan réaliste, séquencé, avec livrables et jalons.",
+      inputs:"OBJECTIF :\n[COLLE ICI]\n\nCONTRAINTES :\n[COLLE ICI]",
+      constraints:"Plan en 4 phases max. Pour chaque phase : objectifs, actions, livrables, risques. Ton concis.",
+      success:"Plan actionnable, sans zones floues, avec dépendances et priorités.",
+      audience:"Équipe projet",
+      examples:"",
+      format:"plan",
+      tone:"direct"
+    },
+    code: {
+      goal:"Écris le code complet pour réaliser la fonctionnalité décrite ci-dessous.",
+      role:"un développeur senior",
+      context:"Je veux une solution simple, lisible et exécutable.",
+      inputs:"SPECS :\n[COLLE ICI]\n\nSTACK :\nHTML/CSS/JS (vanilla) ou autre",
+      constraints:"Fournis 1 fichier complet. Ajoute des commentaires. Explique comment exécuter. Pas de dépendances inutiles.",
+      success:"Code exécutable, structuré, sans erreurs, UX minimale.",
+      audience:"Développeur",
+      examples:"",
+      format:"code",
+      tone:"neutre"
+    },
+    brainstorm: {
+      goal:"Génère 20 idées créatives répondant au besoin ci-dessous, puis sélectionne les 5 meilleures.",
+      role:"un facilitateur de créativité",
+      context:"Je veux des idées variées et non évidentes.",
+      inputs:"BESOIN :\n[COLLE ICI]",
+      constraints:"Réponds en 2 parties : (1) 20 idées courtes (2) top 5 avec justification en 2 lignes chacune.",
+      success:"Idées originales, diversité, top 5 justifié.",
+      audience:"Équipe produit",
+      examples:"",
+      format:"bullets",
+      tone:"creatif"
+    }
+  };
+
+  const templates_en = {
+    rewrite: {
+      goal:"Rewrite the text below to make it clearer and more convincing.",
+      role:"a professional editor",
+      context:"Keep the meaning, improve structure and flow.",
+      inputs:"TEXT TO REWRITE:\n[PASTE HERE]",
+      constraints:"In English. Keep facts. Reduce by 15–25%. Shorter sentences. No jargon.",
+      success:"More readable text, same message, better rhythm. Also propose 3 title alternatives.",
+      audience:"General audience",
+      examples:"I like a simple and direct style.",
+      format:"auto",
+      tone:"pro"
+    },
+    analysis: {
+      goal:"Analyze the situation and propose 3 options with pros/cons and a final recommendation.",
+      role:"a strategy consultant",
+      context:"I need to make a decision and want structured reasoning.",
+      inputs:"CONTEXT & DATA:\n[PASTE HERE]",
+      constraints:"Use a table for options, then a 5–7 line recommendation. Do not invent data.",
+      success:"Distinct options, explicit criteria, well-argued recommendation.",
+      audience:"Decision-maker",
+      examples:"",
+      format:"table",
+      tone:"pro"
+    },
+    plan: {
+      goal:"Build a detailed plan to achieve the goal below.",
+      role:"an execution coach",
+      context:"I want a realistic, sequenced plan with deliverables and milestones.",
+      inputs:"GOAL:\n[PASTE HERE]\n\nCONSTRAINTS:\n[PASTE HERE]",
+      constraints:"Max 4 phases. For each phase: goals, actions, deliverables, risks. Concise tone.",
+      success:"Actionable plan, no vague areas, with dependencies and priorities.",
+      audience:"Project team",
+      examples:"",
+      format:"plan",
+      tone:"direct"
+    },
+    code: {
+      goal:"Write complete code to implement the feature described below.",
+      role:"a senior developer",
+      context:"I want a simple, readable and runnable solution.",
+      inputs:"SPECS:\n[PASTE HERE]\n\nSTACK:\nHTML/CSS/JS (vanilla) or other",
+      constraints:"Provide 1 complete file. Add comments. Explain how to run. No useless dependencies.",
+      success:"Runnable code, structured, no errors, minimal UX.",
+      audience:"Developer",
+      examples:"",
+      format:"code",
+      tone:"neutre"
+    },
+    brainstorm: {
+      goal:"Generate 20 creative ideas for the need below, then pick the best 5.",
+      role:"a creativity facilitator",
+      context:"I want diverse, non-obvious ideas.",
+      inputs:"NEED:\n[PASTE HERE]",
+      constraints:"2 parts: (1) 20 short ideas (2) top 5 with 2-line justification each.",
+      success:"Original ideas, diversity, top 5 justified.",
+      audience:"Product team",
+      examples:"",
+      format:"bullets",
+      tone:"creatif"
+    }
+  };
+
+  // ---------- UI Bindings ----------
+  const fields = ["goal","role","context","inputs","constraints","success","audience","examples","format","tone"];
+  function bindFields(){
+    fields.forEach(id=>{
+      const el = $id(id);
+      el.addEventListener("input", updateAll);
+      el.addEventListener("change", updateAll);
+    });
+  }
+
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      t.classList.add("active");
+      const tab = t.getAttribute("data-tab");
+      $id("tab-score").style.display   = tab==="score" ? "" : "none";
+      $id("tab-suggest").style.display = tab==="suggest" ? "" : "none";
+      $id("tab-examples").style.display= tab==="examples" ? "" : "none";
+    });
+  });
+
+  // ---------- Export ----------
+  function downloadFile(filename, content, mime){
+    const blob = new Blob([content], {type:mime});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename; a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 2000);
+  }
+
+  function gatherData(){
+    return {
+      goal: $id("goal").value,
+      role: $id("role").value,
+      context: $id("context").value,
+      inputs: $id("inputs").value,
+      constraints: $id("constraints").value,
+      success: $id("success").value,
+      audience: $id("audience").value,
+      examples: $id("examples").value,
+      format: $id("format").value,
+      tone: $id("tone").value
+    };
+  }
+
+  function applyData(d){
+    $id("goal").value = d.goal || "";
+    $id("role").value = d.role || "";
+    $id("context").value = d.context || "";
+    $id("inputs").value = d.inputs || "";
+    $id("constraints").value = d.constraints || "";
+    $id("success").value = d.success || "";
+    $id("audience").value = d.audience || "";
+    $id("examples").value = d.examples || "";
+    $id("format").value = d.format || "auto";
+    $id("tone").value = d.tone || "neutre";
+    updateAll();
+  }
+
+  // ---------- Anti-patterns text ----------
+  function getAntiPatterns(){
+    if (lang==="fr"){
+      return `• “Fais-moi un truc bien” → pas d’objectif, pas de format, pas de critères
+• “Tu vois ce que je veux dire” → le modèle ne lit pas tes intentions implicites
+• “Comme tu veux” / “au choix” → ouvre trop l’espace de réponse
+• Aucun input (texte / données) → risque d’hallucination ou de généralités
+• Trop de demandes sans priorités → mélange, réponse superficielle
+• Format non imposé → structure aléatoire, difficile à réutiliser
+• Critères absents → impossible de juger si c’est “bon”`;
+    }
+    return `• “Do something nice” → no goal, no format, no criteria
+• “You know what I mean” → the model can’t read implicit intent
+• “Whatever / as you like” → opens too much space
+• No inputs (text/data) → risk of generic output
+• Too many requests without priorities → shallow answer
+• No forced format → messy structure
+• No criteria → impossible to judge if it’s “good”`;
+  }
+
+  // ---------- Before / After examples ----------
+  function buildBeforeAfter(d){
+    const before = (lang==="fr")
+      ? `Peux-tu m'aider ? Fais un texte sympa.`
+      : `Can you help me? Write something nice.`;
+
+    const after = synthesizePrompt({
+      goal: d.goal || (lang==="fr" ? "Rédige un livrable utile sur le sujet ci-dessous." : "Write a useful deliverable on the topic below."),
+      role: d.role || (lang==="fr" ? "un assistant expert" : "an expert assistant"),
+      context: d.context || (lang==="fr" ? "Contexte : …" : "Context: …"),
+      inputs: d.inputs || (lang==="fr" ? "Entrées : …" : "Inputs: …"),
+      constraints: d.constraints || (lang==="fr" ? "Contraintes : …" : "Constraints: …"),
+      success: d.success || (lang==="fr" ? "Critères : …" : "Criteria: …"),
+      audience: d.audience || "",
+      examples: d.examples || "",
+      format: d.format || "auto",
+      tone: d.tone || (lang==="fr" ? "pro" : "pro")
+    });
+
+    $id("beforeEx").innerText = before;
+    $id("afterEx").innerText = after;
+  }
+
+  // ---------- Update Loop ----------
+  function updateAll(){
+    const d = gatherData();
+    $id("modePill").innerText = (lang==="fr")
+      ? `Mode : ${d.format === "auto" ? "Général" : d.format.toUpperCase()}`
+      : `Mode: ${d.format === "auto" ? "General" : d.format.toUpperCase()}`;
+
+    const scored = scorePrompt(d);
+    $id("scoreVal").innerText = `${scored.total}/100`;
+    $id("kpiClarity").innerText = scored.clarity;
+    $id("kpiConstraints").innerText = scored.constr;
+    $id("kpiData").innerText = scored.data;
+
+    $id("scoreBar").style.width = `${scored.total}%`;
+    const msg = scoreMessage(scored.total);
+    $id("scoreMsg").innerText = msg.txt;
+
+    state.checklist.forEach(c=>{
+      const chk = $id("chk_" + c.key);
+      if (!chk) return;
+      chk.checked = !scored.missing[c.key];
+    });
+
+    $id("finalPrompt").innerText = synthesizePrompt(d);
+
+    const sug = buildSuggestions(d, scored);
+    renderSuggestions(sug);
+
+    $id("antipatterns").innerText = getAntiPatterns();
+    buildBeforeAfter(d);
+  }
+
+  // ---------- Buttons ----------
+  $id("btnAsk3").addEventListener("click", () => {
+    const v = sanitize($id("success").value);
+    const needle = (lang==="fr") ? "pose" : "ask";
+    if (!v.toLowerCase().includes(needle)) {
+      $id("success").value = (v ? v + "\n" : "") + (lang==="fr"
+        ? "Si des informations manquent, pose jusqu’à 3 questions courtes avant de répondre."
+        : "If information is missing, ask up to 3 short questions before answering.");
+      updateAll();
+    }
+  });
+
+  $id("btnAddSteps").addEventListener("click", () => {
+    const v = sanitize($id("constraints").value);
+    const needle = (lang==="fr") ? "étapes" : "steps";
+    if (!v.toLowerCase().includes(needle)) {
+      $id("constraints").value = (v ? v + "\n" : "") + (lang==="fr"
+        ? "Réponds en étapes numérotées."
+        : "Answer in numbered steps.");
+      updateAll();
+    }
+  });
+
+  $id("btnCopy").addEventListener("click", async () => {
+    const text = $id("finalPrompt").innerText;
+    try{
+      await navigator.clipboard.writeText(text);
+      $id("btnCopy").innerText = I18N[lang].copyOk;
+      setTimeout(()=> $id("btnCopy").innerText = I18N[lang].copyDefault, 1100);
+    }catch(e){
+      alert(lang==="fr"
+        ? "Impossible de copier automatiquement. Sélectionne le texte et copie manuellement."
+        : "Unable to copy automatically. Select the text and copy manually.");
+    }
+  });
+
+  $id("btnReset").addEventListener("click", () => {
+    fields.forEach(id=>{
+      if (id==="format") $id(id).value = "auto";
+      else if (id==="tone") $id(id).value = "neutre";
+      else $id(id).value = "";
+    });
+    state.demoIndex = 0;
+    updateAll();
+  });
+
+  $id("btnLoadDemo").addEventListener("click", () => {
+    const demos = (lang==="fr") ? demos_fr : demos_en;
+    const d = demos[state.demoIndex % demos.length];
+    state.demoIndex++;
+    applyData(d);
+  });
+
+  document.querySelectorAll("[data-template]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const key = btn.getAttribute("data-template");
+      const templates = (lang==="fr") ? templates_fr : templates_en;
+      applyData(templates[key]);
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      document.querySelector('.tab[data-tab="score"]').classList.add("active");
+      $id("tab-score").style.display = "";
+      $id("tab-suggest").style.display = "none";
+      $id("tab-examples").style.display = "none";
+    });
+  });
+
+  $id("btnExportTxt").addEventListener("click", () => {
+    downloadFile("prompt.txt", $id("finalPrompt").innerText, "text/plain;charset=utf-8");
+  });
+
+  $id("btnExportJson").addEventListener("click", () => {
+    const d = gatherData();
+    const payload = { meta:{ exported_at: nowISO(), app:"Prompt Coach" }, input:d, final_prompt: $id("finalPrompt").innerText, lang };
+    downloadFile("prompt.json", JSON.stringify(payload,null,2), "application/json;charset=utf-8");
+  });
+
+  // ---------- Language apply ----------
+  function applyLang(newLang){
+    lang = newLang;
+    document.documentElement.lang = lang;
+
+    const t = I18N[lang];
+    document.title = t.docTitle;
+
+    $id("hdr_tagline").innerText = t.hdrTagline;
+    $id("hdr_site").innerText = t.hdrSite;
+
+    $id("mainTitle").innerText = t.mainTitle;
+    $id("mainSub").innerHTML = t.mainSub;
+
+    $id("chip1").innerHTML = t.chips[0];
+    $id("chip2").innerHTML = t.chips[1];
+    $id("chip3").innerHTML = t.chips[2];
+    $id("chip4").innerHTML = t.chips[3];
+    $id("chip5").innerHTML = t.chips[4];
+
+    $id("btnLoadDemo").innerText = t.btnLoadDemo;
+    $id("btnReset").innerText = t.btnReset;
+    $id("btnCopy").innerText = t.copyDefault;
+
+    $id("h2_builder").innerText = t.builderTitle;
+    $id("h2_diag").innerText = t.diagTitle;
+
+    $id("lbl_goal").innerText = t.labels.goal;
+    $id("lbl_role").innerText = t.labels.role;
+    $id("lbl_context").innerText = t.labels.context;
+    $id("lbl_inputs").innerText = t.labels.inputs;
+    $id("lbl_format").innerText = t.labels.format;
+    $id("lbl_tone").innerText = t.labels.tone;
+    $id("lbl_constraints").innerText = t.labels.constraints;
+    $id("lbl_success").innerText = t.labels.success;
+    $id("lbl_audience").innerText = t.labels.audience;
+    $id("lbl_examples").innerText = t.labels.examples;
+
+    $id("hint_goal").innerText = t.hints.goal;
+    $id("hint_role").innerText = t.hints.role;
+    $id("hint_inputs").innerText = t.hints.inputs;
+    $id("hint_format").innerText = t.hints.format;
+    $id("hint_success").innerText = t.hints.success;
+
+    $id("goal").placeholder = t.placeholders.goal;
+    $id("role").placeholder = t.placeholders.role;
+    $id("context").placeholder = t.placeholders.context;
+    $id("inputs").placeholder = t.placeholders.inputs;
+    $id("constraints").placeholder = t.placeholders.constraints;
+    $id("success").placeholder = t.placeholders.success;
+    $id("audience").placeholder = t.placeholders.audience;
+    $id("examples").placeholder = t.placeholders.examples;
+
+    $id("opt_auto").innerText = t.formatOpts.auto;
+    $id("opt_bullets").innerText = t.formatOpts.bullets;
+    $id("opt_table").innerText = t.formatOpts.table;
+    $id("opt_email").innerText = t.formatOpts.email;
+    $id("opt_plan").innerText = t.formatOpts.plan;
+    $id("opt_code").innerText = t.formatOpts.code;
+    $id("opt_json").innerText = t.formatOpts.json;
+
+    $id("tone_neutre").innerText = t.toneOpts.neutre;
+    $id("tone_pro").innerText = t.toneOpts.pro;
+    $id("tone_direct").innerText = t.toneOpts.direct;
+    $id("tone_pedago").innerText = t.toneOpts.pedago;
+    $id("tone_creatif").innerText = t.toneOpts.creatif;
+    $id("tone_humble").innerText = t.toneOpts.humble;
+
+    $id("realtimeMsg").innerText = t.realtimeMsg;
+    $id("btnAsk3").innerText = t.btnAsk3;
+    $id("btnAddSteps").innerText = t.btnAddSteps;
+
+    $id("tabScore").innerText = t.tabs.score;
+    $id("tabSuggest").innerText = t.tabs.suggest;
+    $id("tabExamples").innerText = t.tabs.examples;
+
+    $id("labScore").innerText = t.kpi.score;
+    $id("labClarity").innerText = t.kpi.clarity;
+    $id("labConstraints").innerText = t.kpi.constraints;
+    $id("labData").innerText = t.kpi.data;
+
+    $id("lbl_final").innerText = t.labels.final;
+    $id("btnExportTxt").innerText = t.exportTxt;
+    $id("btnExportJson").innerText = t.exportJson;
+    $id("footerMsg").innerHTML = t.footer;
+
+    $id("lbl_recos").innerText = t.labels.recos;
+    $id("lbl_anti").innerText = t.labels.anti;
+
+    $id("lbl_before").innerText = t.labels.before;
+    $id("lbl_after").innerText = t.labels.after;
+    $id("badge_before").innerText = t.badges.before;
+    $id("badge_after").innerText = t.badges.after;
+
+    $id("lbl_templates").innerText = t.labels.templates;
+    $id("tpl_rewrite").innerText = (lang==="fr") ? "Réécriture" : "Rewrite";
+    $id("tpl_analysis").innerText = (lang==="fr") ? "Analyse" : "Analysis";
+    $id("tpl_plan").innerText = (lang==="fr") ? "Plan" : "Plan";
+    $id("tpl_code").innerText = (lang==="fr") ? "Code" : "Code";
+    $id("tpl_brainstorm").innerText = "Brainstorm";
+
+    $id("tpl_hint").innerText = t.hints.templates;
+
+    buildChecklist();
+    updateAll();
+  }
+
+  // ---------- Lang switch ----------
+  $id("btnLang").addEventListener("click", () => {
+    applyLang(lang==="fr" ? "en" : "fr");
+  });
+
+  // ---------- Init ----------
+  bindFields();
+  applyLang("fr"); // default
+})();
 </script>
 
 </body>
